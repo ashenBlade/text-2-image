@@ -10,6 +10,9 @@ packages = [{include = "src/text_to_image"}]
 python = "^3.10"
 numpy = "^1.23.3"
 Pillow = "^9.2.0"
+fastapi = "^0.85.0"
+uvicorn = "^0.18.3"
+python-multipart = "^0.0.5"
 
 
 [tool.poetry.group.dev.dependencies]
