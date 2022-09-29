@@ -1,7 +1,7 @@
 import pytest
 from PIL.Image import Image
 
-from src.text_to_image import to_image
+from text_to_image import to_image
 
 
 SAMPLE_STRINGS = [

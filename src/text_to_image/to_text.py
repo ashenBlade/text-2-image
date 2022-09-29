@@ -2,5 +2,5 @@ from PIL.Image import Image
 
 
 def to_text(image: Image) -> str:
-    raise NotImplementedError()
-
+    decoded = image.tobytes().decode('utf-8')
+    return decoded.rstrip('\0')
