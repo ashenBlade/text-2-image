@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["ash.blade <ashen.blade.dev@gmail.com>"]
 readme = "README.md"
-packages = [{include = "text_2_image"}]
+packages = [{include = "src/text_2_image"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -14,6 +14,7 @@ Pillow = "^9.2.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^0.981"
+pytest = "^7.1.3"
 
 [build-system]
 requires = ["poetry-core"]
