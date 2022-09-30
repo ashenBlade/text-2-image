@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="html">
 <head>
     <meta charset="UTF-8">
     <title>Text to image</title>
     <link rel="stylesheet" href="style.css"/>
-    <link rel="script" href="script.js">
+    <script defer src="script.js"></script>
 </head>
-<body>
-    Hello, world!
+<body class="body">
+<div class="container">
+    <div class="content">
+        <header class="header align-bottom">
+            <img src="description_FILL0_wght400_GRAD0_opsz48.svg" alt="Text">
+            <p class="capitalize">
+                Text-2-Image
+            </p>
+            <img src="image_FILL0_wght400_GRAD0_opsz48.svg" alt="Image">
+        </header>
+        <main class="main align-top">
+            <textarea class="input-text" placeholder="Enter text to encrypt or drag a file..."></textarea>
+            <div class="mt d-flex justify-content-center">
+                <input type="button" class="btn btn-encrypt" id="input-button" value="Encrypt"/>
+            </div>
+        </main>
+    </div>
+</div>
 </body>
 </html>
