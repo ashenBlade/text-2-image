@@ -34,6 +34,7 @@
     padding: 10px;
     border: 2px solid gray;
     height: 150px;
+    width: 100%;
 }
 
 .align-bottom {

@@ -17,16 +17,23 @@
             <img src="image.svg" alt="Image">
         </header>
         <main class="main align-top">
-            <textarea class="input-text"
-                      placeholder="Enter text to encrypt or drag a file..."
-                      id="input-text">
-            </textarea>
-            <div class="mt d-flex justify-content-center">
-                <input type="button"
-                       class="btn btn-encrypt"
-                       id="input-button"
-                       value="Encrypt"/>
-            </div>
+            <form id="main-form" method="POST" action="/api/text/to/image">
+                <div class="justify-content-center">
+                    <textarea class="input-text"
+                              placeholder="Enter text to encrypt or drag a file..."
+                              id="input-text"
+                              name="text"></textarea>
+                </div>
+                <input type="file"
+                       style="display: none"
+                       id="input-file"/>
+                <div class="mt d-flex justify-content-center">
+                    <input type="submit"
+                           class="btn btn-encrypt"
+                           id="input-button"
+                           value="Encrypt"/>
+                </div>
+            </form>
         </main>
     </div>
 </div>

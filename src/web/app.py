@@ -4,7 +4,7 @@ import os
 
 import PIL
 from PIL import Image
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile, Form
 from starlette.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from text_to_image import to_image, to_text
@@ -35,12 +35,17 @@ async def get__text_to_image(text: str, filename: str = 'encrypted', extension: 
 
 
 @app.post('/api/text/to/image', response_class=StreamingResponse)
-async def post__text_to_image(file: UploadFile, encoding: str = 'utf-8', extension: str = 'png', filename: str = None):
-    if file.content_type is not 'text/plain':
-        raise HTTPException(status_code=422, detail='Content type must be "text/plain"')
-    filename = filename or file.filename
-    text = await file.read()
-    return text_to_image_inner(text.decode(encoding), filename, extension)
+async def post__text_to_image(file: UploadFile = None, text: str = Form(), encoding: str = 'utf-8', extension: str = 'png', filename: str = None):
+    if file:
+        if file.content_type is not 'text/plain':
+            raise HTTPException(status_code=422, detail='Content type must be "text/plain"')
+        filename = filename or file.filename
+        bytes = await file.read()
+        return text_to_image_inner(bytes.decode(encoding), filename, extension)
+    if text:
+        return text_to_image_inner(text, filename, extension)
+    raise HTTPException(status_code=400, detail='Text or file not provided')
+
 
 
 def convert_to_byte_io(image):
