@@ -3,7 +3,7 @@ from io import BytesIO
 
 import PIL
 from PIL import Image
-from fastapi import FastAPI, File, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from starlette.responses import StreamingResponse
 
 from text_to_image import to_image, to_text
@@ -15,18 +15,31 @@ text_to_image_logger = logging.getLogger('text_to_image')
 image_to_text_logger = logging.getLogger('image_to_text')
 
 
-@app.post('/api/text/to/image', response_class=StreamingResponse)
-async def get__text_to_image(text: str, filename: str = None, extension: str = 'png'):
+def text_to_image_inner(text: str, filename: str, extension: str):
     if len(text) == 0:
         raise HTTPException(status_code=400, detail='Input text must not be empty')
 
     text_to_image_logger.info('Convert of string with length: %i', len(text))
     image = encrypt_to_image(text)
     response = convert_to_byte_io(image)
-    filename = filename or f'text-to-image.{extension}'
+    filename = f'{filename}.{extension}'
     return StreamingResponse(response, media_type='image/png', status_code=200, headers={
         'Content-Disposition': f'attachment; filename="{filename}"'
     })
+
+
+@app.get('/api/text/to/image', response_class=StreamingResponse)
+async def get__text_to_image(text: str, filename: str = 'encrypted', extension: str = 'png'):
+    return text_to_image_inner(text, filename, extension)
+
+
+@app.post('/api/text/to/image', response_class=StreamingResponse)
+async def post__text_to_image(file: UploadFile, encoding: str = 'utf-8', extension: str = 'png', filename: str = None):
+    if file.content_type is not 'text/plain':
+        raise HTTPException(status_code=422, detail='Content type must be "text/plain"')
+    filename = filename or file.filename
+    text = await file.read()
+    return text_to_image_inner(text.decode(encoding), filename, extension)
 
 
 def convert_to_byte_io(image):
@@ -44,17 +57,31 @@ def encrypt_to_image(text):
         raise HTTPException(status_code=500, detail='Could not convert given text. Internal error. Sorry')
 
 
+SUPPORTED_EXTENSIONS = {
+    ex.lstrip('.')
+    for ex, f in Image.registered_extensions().items()
+    if f in Image.OPEN
+}
+
+
+def is_supported_content_type(content_type: str):
+    [image, content_type] = content_type.lower().split('/')
+    return image == 'image' and content_type in SUPPORTED_EXTENSIONS
+
+
 @app.post('/api/image/to/text')
-async def get__image_to_text(file: bytes = File()):
-    image_to_text_logger.info('File length: %i', len(file))
-    image = convert_to_image(file)
+async def post__image_to_text(file: UploadFile):
+    image_to_text_logger.warning('Requested convert for file: Content-Type: "%s", Filename: "%s"',
+                                 file.content_type,
+                                 file.filename)
+    image = await convert_to_image(file)
     text = decrypt_image(image)
     return {
-        'text': text
+        'decrypted': text
     }
 
 
-def decrypt_image(image):
+def decrypt_image(image: Image):
     try:
         text = to_text(image)
     except ValueError as value:
@@ -63,9 +90,10 @@ def decrypt_image(image):
     return text
 
 
-def convert_to_image(file):
+async def convert_to_image(file: UploadFile):
     try:
-        image = Image.open(BytesIO(file))
+        content = await file.read()
+        image = Image.open(BytesIO(content))
     except PIL.UnidentifiedImageError as unidentified:
         image_to_text_logger.warning('Received image can not be opened and identified', exc_info=unidentified)
         raise HTTPException(status_code=400, detail='Can not parse given image')
