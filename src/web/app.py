@@ -1,11 +1,12 @@
 import logging
 from io import BytesIO
+import os
 
 import PIL
 from PIL import Image
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile
 from starlette.responses import StreamingResponse
-
+from fastapi.staticfiles import StaticFiles
 from text_to_image import to_image, to_text
 
 app = FastAPI()
@@ -98,3 +99,6 @@ async def convert_to_image(file: UploadFile):
         image_to_text_logger.warning('Received image can not be opened and identified', exc_info=unidentified)
         raise HTTPException(status_code=400, detail='Can not parse given image')
     return image
+
+app.mount('/', StaticFiles(directory=os.path.join(os.path.dirname(__file__), 'static'), html=True), name='static')
+
