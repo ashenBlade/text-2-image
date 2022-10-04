@@ -1,49 +1,85 @@
-function getFilename(contentDisposition) {
-    const [, filenamePart] = contentDisposition.split(';')
-    const [,filenameQuoted] = filenamePart.split('=')
-    return filenameQuoted.trim('"');
-}
-
 function startUp() {
     const buttonInput = document.getElementById('input-button');
-    const textInput = document.getElementById('input-text');
-    const mainForm = document.getElementById('main-form')
+    const textareaInput = document.getElementById('input-text');
     const fileInput = document.getElementById('input-file');
-    mainForm.onsubmit = (e) => e.preventDefault();
+    const inputFileDiv = document.getElementById('upload-file-div');
+    const removeFileButton = document.getElementById('remove-file-button');
+    const uploadFilename = document.getElementById('upload-filename');
+    const mainForm = document.getElementById('main-form');
+
+    function isTextInput() {
+        return !textareaInput.disabled;
+    }
+
+    function isFileInput() {
+        return !fileInput.disabled;
+    }
+
+    function switchToText() {
+        textareaInput.classList.remove('d-none');
+        textareaInput.hidden = false;
+        textareaInput.disabled = false;
+
+        inputFileDiv.classList.add('d-none');
+        inputFileDiv.hidden = true;
+        inputFileDiv.disabled = true;
+        fileInput.disabled = true;
+
+        buttonInput.disabled = !isTextInInput();
+
+        mainForm.enctype = 'application/x-www-form-urlencoded';
+    }
+
+    function switchToFile() {
+        textareaInput.classList.add('d-none')
+        textareaInput.hidden = true;
+        textareaInput.disabled = true;
+
+        inputFileDiv.classList.remove('d-none');
+        inputFileDiv.hidden = false;
+        inputFileDiv.disabled = false;
+        fileInput.disabled = false;
+
+        buttonInput.disabled = !isFileInInput();
+
+        mainForm.enctype = 'multipart/form-data'
+    }
+
+    function isFileInInput() {
+        return fileInput.files.length > 0;
+    }
+
+    function isTextInInput() {
+        return textareaInput.value.length > 0;
+    }
+
+    textareaInput.addEventListener('input', e => {
+        if (textareaInput.value.length === 0) {
+            buttonInput.disabled = true;
+        } else if (textareaInput.value.length === 1) {
+            buttonInput.disabled = false;
+        }
+    });
+
 
     buttonInput.onclick = async function () {
-        const requestBody = new FormData();
-        requestBody.append('text', textInput.value)
-
-        const response = await fetch('/api/text/to/image', {
-            'body': requestBody,
-            method: 'POST',
-        });
-
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a')
-        a.href = url;
-        a.download = getFilename(response.headers.get('content-disposition'));
-        document.body.appendChild(a)
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+        return !(isTextInput() && !isTextInInput());
     }
-    window.ondrop = function (e) {
-        console.log('ondrop')
+
+    removeFileButton.onclick = function (e) {
         e.preventDefault();
-        if (e.dataTransfer.items) {
-            [...e.dataTransfer.items].forEach((item, i) => {
-                if (item.kind === 'file') {
-                    const file = item.getAsFile();
-                    console.log(`... file[${i}].name = ${file.name}`)
-                }
-            })
+        fileInput.files.length = 0;
+        switchToText();
+    }
+
+    window.ondrop = async function (e) {
+        e.preventDefault();
+        if (e.dataTransfer.files.length === 1) {
+            fileInput.files = e.dataTransfer.files;
+            uploadFilename.innerHTML = e.dataTransfer.files[0].name;
+            switchToFile();
         } else {
-            [...e.dataTransfer.items].forEach((item, i) => {
-                console.log(`...file[${i}].name = ${item.name}`)
-            })
+            alert('Choose only single file')
         }
     }
 }

@@ -11,7 +11,7 @@
     <div class="content">
         <header class="header align-bottom">
             <img src="text-file.svg" alt="Text">
-            <p class="capitalize">
+            <p class="title">
                 Text-2-Image
             </p>
             <img src="image.svg" alt="Image">
@@ -19,19 +19,34 @@
         <main class="main align-top">
             <form id="main-form" method="POST" action="/api/text/to/image">
                 <div class="justify-content-center">
-                    <textarea class="input-text"
-                              placeholder="Enter text to encrypt or drag a file..."
-                              id="input-text"
-                              name="text"></textarea>
+                    <div class="shown-input">
+                        <textarea class="input-text"
+                                  placeholder="Enter text to encrypt or drag a file..."
+                                  id="input-text"
+                                  name="text"></textarea>
+                        <div class="input-file d-none"  id="upload-file-div">
+                            <img src="upload-file.svg" alt="Upload file"/>
+                            <p id="upload-filename" class="upload-filename"></p>
+                            <div class="justify-content-center">
+                                <button id="remove-file-button" class="btn btn-reset">
+                                    Remove
+                                </button>
+                            </div>
+                            <input type="file"
+                                   hidden="hidden"
+                                   id="input-file"
+                                   class="d-none"
+                                   name="file"
+                                   disabled/>
+                        </div>
+                    </div>
                 </div>
-                <input type="file"
-                       style="display: none"
-                       id="input-file"/>
                 <div class="mt d-flex justify-content-center">
                     <input type="submit"
                            class="btn btn-encrypt"
                            id="input-button"
-                           value="Encrypt"/>
+                           value="Encrypt"
+                           disabled/>
                 </div>
             </form>
         </main>
