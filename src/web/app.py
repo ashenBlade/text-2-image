@@ -4,10 +4,11 @@ import os
 
 import PIL
 from PIL import Image
-from fastapi import FastAPI, HTTPException, UploadFile, Form, File, logger
+from fastapi import FastAPI, HTTPException, UploadFile, Form, File
 from starlette.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from text_to_image import to_image, to_text
+
+from text_to_image import TextImage, PngPilTextImageSaver
 
 app = FastAPI()
 
@@ -41,8 +42,6 @@ async def post__text_to_image(file: UploadFile = File(None),
                               extension: str = 'png',
                               filename: str = 'encrypted'):
     if file:
-        # if file.content_type != 'text/plain':
-        #     raise HTTPException(status_code=422, detail='Content type must be "text/plain"')
         filename = filename or file.filename
         bytes = await file.read()
         return text_to_image_inner(bytes.decode(encoding), filename, extension)
@@ -50,6 +49,12 @@ async def post__text_to_image(file: UploadFile = File(None),
         return text_to_image_inner(text, filename, extension)
     raise HTTPException(status_code=400, detail='Text or file not provided')
 
+
+SUPPORTED_EXTENSIONS = {
+    ex.lstrip('.')
+    for ex, f in Image.registered_extensions().items()
+    if f in Image.OPEN
+}
 
 
 def convert_to_byte_io(image):
@@ -59,19 +64,31 @@ def convert_to_byte_io(image):
     return response
 
 
+async def convert_to_image(file: UploadFile):
+    try:
+        content = await file.read()
+        image = Image.open(BytesIO(content))
+    except PIL.UnidentifiedImageError as unidentified:
+        image_to_text_logger.warning('Received image can not be opened and identified', exc_info=unidentified)
+        raise HTTPException(status_code=400, detail='Can not parse given image')
+    return image
+
+
+def decrypt_image(image: Image):
+    try:
+        text = to_text(image)
+    except ValueError as value:
+        image_to_text_logger.warning('Could not convert parsed image to text', exc_info=value)
+        raise HTTPException(status_code=400, detail='Can not convert parsed image to text')
+    return text
+
+
 def encrypt_to_image(text):
     try:
         return to_image(text)
     except ValueError as value:
         text_to_image_logger.info('Could not convert text to image: "%s"', text, exc_info=value)
         raise HTTPException(status_code=500, detail='Could not convert given text. Internal error. Sorry')
-
-
-SUPPORTED_EXTENSIONS = {
-    ex.lstrip('.')
-    for ex, f in Image.registered_extensions().items()
-    if f in Image.OPEN
-}
 
 
 def is_supported_content_type(content_type: str):
@@ -91,23 +108,6 @@ async def post__image_to_text(file: UploadFile):
     }
 
 
-def decrypt_image(image: Image):
-    try:
-        text = to_text(image)
-    except ValueError as value:
-        image_to_text_logger.warning('Could not convert parsed image to text', exc_info=value)
-        raise HTTPException(status_code=400, detail='Can not convert parsed image to text')
-    return text
-
-
-async def convert_to_image(file: UploadFile):
-    try:
-        content = await file.read()
-        image = Image.open(BytesIO(content))
-    except PIL.UnidentifiedImageError as unidentified:
-        image_to_text_logger.warning('Received image can not be opened and identified', exc_info=unidentified)
-        raise HTTPException(status_code=400, detail='Can not parse given image')
-    return image
-
-app.mount('/', StaticFiles(directory=os.path.join(os.path.dirname(__file__), 'static'), html=True), name='static')
-
+app.mount('/',
+          StaticFiles(directory=os.path.join(os.path.dirname(__file__), 'static'), html=True),
+          name='static')
