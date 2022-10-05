@@ -13,6 +13,8 @@ class TextImage:
     def __init__(self, data: Iterable[int] | bytes | Iterable[SupportsIndex],
                  encoding: str = DEFAULT_ENCODING):
         self.data = bytes(data)
+        if not self.data:
+            raise ValueError('Data for image is not provided')
         self._encoding = encoding
 
     @cached_property
