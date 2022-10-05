@@ -24,13 +24,16 @@ class PilTextImageSaver(TextImageSaver, ABC):
             first, second, third = None, None, None
             while True:
                 try:
-                    first, second, third = None, None, None
                     first = next(it)
                     second = next(it)
                     third = next(it)
                     yield first, second, third
+                    first, second, third = None, None, None
                 except StopIteration:
-                    yield (first or 0), (second or 0), (third or 0)
+                    # incorrect data-pixel alignment
+                    if first:
+                        yield first, (second or 0), (third or 0)
+
                     break
 
         pil_image.putdata(list(flattened_image_data()))
