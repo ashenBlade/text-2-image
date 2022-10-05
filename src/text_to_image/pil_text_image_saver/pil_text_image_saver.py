@@ -14,10 +14,24 @@ class PilTextImageSaver(TextImageSaver, ABC):
         super().__init__(format)
         self.image_mode = mode
 
-    def save_inner(self, fd: BinaryIO, image: PILImage.Image):
-        image.save(fd, self.format)
-
     def save(self, fd: BinaryIO, image: TextImage) -> None:
-        """Inherited  classes must implement save_inner method"""
-        pil_image = PILImage.new(self.image_mode, image.size, color=0)
-        self.save_inner(fd, pil_image)
+        pil_image = PILImage.new(mode=self.image_mode,
+                                 size=image.size,
+                                 color=(0, 0, 0))
+
+        def flattened_image_data():
+            it = iter(image.data)
+            first, second, third = None, None, None
+            while True:
+                try:
+                    first, second, third = None, None, None
+                    first = next(it)
+                    second = next(it)
+                    third = next(it)
+                    yield first, second, third
+                except StopIteration:
+                    yield (first or 0), (second or 0), (third or 0)
+                    break
+
+        pil_image.putdata(list(flattened_image_data()))
+        pil_image.save(fd, format=self.format)

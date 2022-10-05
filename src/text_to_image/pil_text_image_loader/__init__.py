@@ -1,1 +1,1 @@
-from .pil_text_image_loader import PilTextImageLoader
+from .png_pil_text_image_loader import PngPilTextImageLoader

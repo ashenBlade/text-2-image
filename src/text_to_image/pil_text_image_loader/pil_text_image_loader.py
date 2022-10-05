@@ -15,4 +15,4 @@ class PilTextImageLoader(TextImageLoader):
     def load(self, fd: BinaryIO) -> TextImage:
         pil_image = PILImage.open(fd)
         loaded = pil_image.tobytes()
-        return TextImage(loaded)
+        return TextImage(loaded.rstrip(b'\0'))

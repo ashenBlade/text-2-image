@@ -24,8 +24,7 @@ int main() {
 '''
 ])
 def test__save__with_valid_image__save_image_in_png_format(saver, text):
-    image = TextImage.from_text('text')
-
+    image = TextImage.from_text(text)
     saver_data = BytesIO()
     saver.save(saver_data, image)
     saver_data.seek(0)
