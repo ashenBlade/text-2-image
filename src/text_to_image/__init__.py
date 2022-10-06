@@ -1,6 +1,7 @@
 from .domain import (
     TextImage,
-    TextImageSaver
+    TextImageSaver,
+    TextImageLoader
 )
 from .pil_text_image_saver import (
     PngPilTextImageSaver
@@ -13,5 +14,6 @@ __all__ = (
     'TextImage',
     'TextImageSaver',
     'PngPilTextImageSaver',
-    'PngPilTextImageLoader'
+    'PngPilTextImageLoader',
+    'TextImageLoader'
 )

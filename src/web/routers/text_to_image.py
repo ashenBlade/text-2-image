@@ -2,10 +2,11 @@ import logging
 from http import HTTPStatus
 from io import BytesIO
 
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Depends
 from starlette.responses import StreamingResponse
 
-from text_to_image import TextImage, PngPilTextImageSaver
+from text_to_image import TextImage, TextImageSaver
+from web.dependencies import get_text_image_saver
 
 router = APIRouter()
 
@@ -20,11 +21,12 @@ def is_image_supported(image_extension: str):
     return image_extension.lower() in SUPPORTED_IMAGE_EXTENSIONS
 
 
-def write_image_to_bytes_io(text: str) -> BytesIO:
+def write_image_to_bytes_io(text: str,
+                            image_saver: TextImageSaver) -> BytesIO:
     try:
         image = TextImage.from_text(text)
         buffer = BytesIO()
-        PngPilTextImageSaver().save(buffer, image)
+        image_saver.save(buffer, image)
         buffer.seek(0)
         return buffer
     except ValueError as value:
@@ -38,7 +40,7 @@ def create_headers_for_file_response(filename: str):
     }
 
 
-def text_to_image_internal(text: str, filename: str, extension: str):
+def text_to_image_internal(text: str, filename: str, extension: str, image_saver: TextImageSaver):
     if len(text) == 0:
         raise HTTPException(status_code=400,
                             detail='Input text must not be empty')
@@ -48,7 +50,7 @@ def text_to_image_internal(text: str, filename: str, extension: str):
                             detail=f"Image extension '{extension}' is not supported")
 
     text_to_image_logger.info('Convert of string with length: %i', len(text))
-    response = write_image_to_bytes_io(text)
+    response = write_image_to_bytes_io(text, image_saver)
     return StreamingResponse(response,
                              media_type=f'image/{extension}',
                              status_code=200,
@@ -59,7 +61,8 @@ def text_to_image_internal(text: str, filename: str, extension: str):
 async def post__text_to_image(file: UploadFile = File(None),
                               text: str = Form(None),
                               image_extension: str = 'png',
-                              filename: str = None):
+                              filename: str = None,
+                              image_saver: TextImageSaver = Depends(get_text_image_saver)):
     default_encoding = 'utf-8'
     default_filename = 'encrypted'
 
@@ -84,12 +87,14 @@ async def post__text_to_image(file: UploadFile = File(None),
     if file:
         return text_to_image_internal(await get_file_content_text(),
                                       get_filename(),
-                                      image_extension)
+                                      image_extension,
+                                      image_saver)
 
     if text:
         return text_to_image_internal(text,
                                       get_filename(),
-                                      image_extension)
+                                      image_extension,
+                                      image_saver)
 
     raise HTTPException(status_code=400,
                         detail='Text or file not provided')

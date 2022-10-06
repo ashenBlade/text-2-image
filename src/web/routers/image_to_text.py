@@ -1,10 +1,11 @@
 import logging
 from io import BytesIO
 
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
 from starlette.responses import PlainTextResponse
 
-from text_to_image import PngPilTextImageLoader
+from text_to_image.domain import TextImageLoader
+from web.dependencies import get_text_image_loader
 
 SUPPORTED_IMAGE_EXTENSIONS = {
     'png'
@@ -26,7 +27,8 @@ logger = logging.getLogger(__name__)
 
 
 @router.post('/api/image/to/text', response_class=PlainTextResponse)
-async def post__image_to_text(file: UploadFile = File()):
+async def post__image_to_text(file: UploadFile = File(),
+                              image_loader: TextImageLoader = Depends(get_text_image_loader)):
     async def extract_text_image():
         if not file:
             raise HTTPException(status_code=400, detail='File not provided')
@@ -36,8 +38,7 @@ async def post__image_to_text(file: UploadFile = File()):
             raise HTTPException(status_code=400, detail='Provided file is empty')
 
         io = BytesIO(file_bytes)
-        loader = PngPilTextImageLoader()
-        return loader.load(io)
+        return image_loader.load(io)
 
     def format_response_filename():
         split = file.filename.rstrip('.').split('.')
