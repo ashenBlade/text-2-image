@@ -1,11 +1,14 @@
-import React, {useState} from 'react';
+import React, {FC, useState} from 'react';
 import {Button, Space, Upload} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
 import {FileTextOutlined} from "@ant-design/icons";
+import EncryptionProps from "./EncryptionProps";
 
-const Encryption = () => {
+const Encryption: FC<EncryptionProps> = ({encryptor}) => {
+    const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [imageLoading, setImageLoading] = useState(false);
 
     function isTextInput() {
         return selectedFile === null;
@@ -27,6 +30,37 @@ const Encryption = () => {
         e.bubbles = false;
         e.preventDefault();
         setSelectedFile(null);
+    }
+
+    async function encryptButtonOnClick() {
+        let data: string;
+        try {
+            data = isTextInput() ? inputText : await selectedFile!.text();
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+        setImageLoading(true);
+        try {
+            let blob: Blob;
+            try {
+                blob = await encryptor.encryptAsync(data);
+            } catch (e) {
+                console.error('Could not encrypt image', e);
+                return;
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.hidden = true;
+            a.type = 'download';
+            document.appendChild(a);
+            a.click();
+            document.removeChild(a);
+        }
+        finally {
+            setImageLoading(false);
+        }
     }
 
     return (
@@ -56,7 +90,10 @@ const Encryption = () => {
                                        resize: 'none',
                                        height: '100%',
                                        width: '100%',
-                                   }}/>
+                                   }}
+                         value={inputText}
+                         onChange={e => setInputText(e.currentTarget.value)
+                         }/>
                          : <Space align={'center'} direction={'vertical'}>
                              <FileTextOutlined style={{fontSize: '64px'}}/>
                              <h3>{selectedFile?.name}</h3>
@@ -75,7 +112,9 @@ const Encryption = () => {
                     marginTop: '10px'
                 }}>
                     <Button type={'primary'}
-                            size={'large'}>
+                            size={'large'}
+                            onClick={encryptButtonOnClick}
+                            disabled={imageLoading || (isTextInput() && !inputText)}>
                         Encrypt
                     </Button>
                 </div>
