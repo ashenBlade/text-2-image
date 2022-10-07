@@ -39,6 +39,7 @@ const Encryption = () => {
             <div style={{
                 display: 'block',
                 justifyContent: 'center',
+                height: '100%'
             }}>
                  <Upload type={'drag'}
                          multiple={false}
