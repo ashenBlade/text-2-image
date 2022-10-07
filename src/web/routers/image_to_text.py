@@ -3,7 +3,7 @@ from http import HTTPStatus
 from io import BytesIO
 
 from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
-from starlette.responses import PlainTextResponse
+from starlette.responses import PlainTextResponse, Response
 
 from text_to_image.domain import TextImageLoader
 from web.dependencies import get_text_image_loader
@@ -11,7 +11,7 @@ from web.dependencies import get_text_image_loader
 SUPPORTED_IMAGE_EXTENSIONS = {"png"}
 
 
-def is_image_supported(image_extension: str):
+def is_image_supported(image_extension: str) -> bool:
     return image_extension.lower() in SUPPORTED_IMAGE_EXTENSIONS
 
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 async def post__image_to_text(
     file: UploadFile = File(),
     image_loader: TextImageLoader = Depends(get_text_image_loader),
-):
+) -> Response:
     if not file:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail="Image file not provided"

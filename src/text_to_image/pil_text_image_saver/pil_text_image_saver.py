@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import BinaryIO
+from typing import BinaryIO, Generator
 
 from PIL import Image as PILImage  # type: ignore
 
@@ -17,7 +17,7 @@ class PilTextImageSaver(TextImageSaver, ABC):
     def save(self, fd: BinaryIO, image: TextImage) -> None:
         pil_image = PILImage.new(mode=self.image_mode, size=image.size, color=(0, 0, 0))
 
-        def flattened_image_data():
+        def flattened_image_data() -> Generator[tuple[int, int, int], None, None]:
             it = iter(image.data)
             first, second, third = None, None, None
             while True:

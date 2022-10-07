@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-def setup_middleware(fast_api: FastAPI):
+def setup_middleware(fast_api: FastAPI) -> None:
     if not fast_api.debug:
         raise RuntimeError("Need to configure CORS for production")
 
@@ -28,12 +28,12 @@ def setup_middleware(fast_api: FastAPI):
     )
 
 
-def setup_routers(fast_api):
+def setup_routers(fast_api: FastAPI) -> None:
     fast_api.include_router(image_to_text_router)
     fast_api.include_router(text_to_image_router)
 
 
-def create_app():
+def create_app() -> FastAPI:
     fast_api = FastAPI()
 
     setup_middleware(fast_api)

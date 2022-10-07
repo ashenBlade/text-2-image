@@ -3,7 +3,7 @@ from http import HTTPStatus
 from io import BytesIO
 
 from fastapi import APIRouter, Form, HTTPException, Depends
-from starlette.responses import StreamingResponse
+from starlette.responses import StreamingResponse, Response
 
 from text_to_image import TextImage, TextImageSaver
 from web.dependencies import get_text_image_saver
@@ -15,7 +15,7 @@ text_to_image_logger = logging.getLogger(__name__)
 SUPPORTED_IMAGE_EXTENSIONS = {"png"}
 
 
-def is_image_extension_supported(image_extension: str):
+def is_image_extension_supported(image_extension: str) -> bool:
     return image_extension.lower() in SUPPORTED_IMAGE_EXTENSIONS
 
 
@@ -41,7 +41,7 @@ async def post__text_to_image(
     text: str = Form(),
     image_extension: str = Form("png"),
     image_saver: TextImageSaver = Depends(get_text_image_saver),
-):
+) -> Response:
     if not len(text):
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,

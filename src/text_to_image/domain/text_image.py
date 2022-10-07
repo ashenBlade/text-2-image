@@ -30,5 +30,5 @@ class TextImage:
         return self.data.decode(self._encoding)
 
     @classmethod
-    def from_text(cls, text: str, encoding=DEFAULT_ENCODING) -> TextImage:
+    def from_text(cls, text: str, encoding: str = DEFAULT_ENCODING) -> TextImage:
         return cls(text.encode(encoding=encoding), encoding)
