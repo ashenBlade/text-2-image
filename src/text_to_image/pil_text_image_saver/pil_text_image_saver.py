@@ -8,16 +8,14 @@ from .image_mode import ImageMode
 
 
 class PilTextImageSaver(TextImageSaver, ABC):
-    DEFAULT_MODE: ImageMode = 'RGB'
+    DEFAULT_MODE: ImageMode = "RGB"
 
     def __init__(self, format: str, mode: ImageMode = DEFAULT_MODE):
         super().__init__(format)
         self.image_mode = mode
 
     def save(self, fd: BinaryIO, image: TextImage) -> None:
-        pil_image = PILImage.new(mode=self.image_mode,
-                                 size=image.size,
-                                 color=(0, 0, 0))
+        pil_image = PILImage.new(mode=self.image_mode, size=image.size, color=(0, 0, 0))
 
         def flattened_image_data():
             it = iter(image.data)

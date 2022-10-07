@@ -3,24 +3,28 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import (
-    image_to_text_router,
-    text_to_image_router
-)
+from .routers import image_to_text_router, text_to_image_router
 
-logging.basicConfig(format="%(asctime)s - [%(levelname)s] -  %(name)s - %(filename)s.%(funcName)s - %(message)s")
+
+logging.basicConfig(
+    format="%(asctime)s - "
+    "[%(levelname)s] -  "
+    "%(name)s - "
+    "%(filename)s.%(funcName)s - "
+    "%(message)s"
+)
 
 
 def setup_middleware(fast_api: FastAPI):
     if not fast_api.debug:
-        raise RuntimeError('Need to configure CORS for production')
+        raise RuntimeError("Need to configure CORS for production")
 
     fast_api.add_middleware(
         CORSMiddleware,
-        allow_origins=['*'],
+        allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=['*'],
-        allow_headers=['*']
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
 

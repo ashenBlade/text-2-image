@@ -6,7 +6,7 @@ from PIL import Image as PILImage
 
 
 class PilTextImageLoader(TextImageLoader):
-    DEFAULT_ENCODING = 'utf-8'
+    DEFAULT_ENCODING = "utf-8"
 
     def __init__(self, format: str, encoding: str = DEFAULT_ENCODING):
         super().__init__(format)
@@ -15,4 +15,4 @@ class PilTextImageLoader(TextImageLoader):
     def load(self, fd: BinaryIO) -> TextImage:
         pil_image = PILImage.open(fd)
         loaded = pil_image.tobytes()
-        return TextImage(loaded.rstrip(b'\0'))
+        return TextImage(loaded.rstrip(b"\0"))
