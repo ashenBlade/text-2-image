@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {FC, useState} from 'react';
 import 'antd/dist/antd.css';
 import {Layout} from "antd";
 import {Content} from "antd/es/layout/layout";
@@ -7,10 +7,11 @@ import Encryption from "../Encryption/Encryption";
 import Decryption from "../Decryption/Decryption";
 import SwitchHeader from "../SwitchHeader/SwitchHeader";
 import BackendEncryptorService from "../../services/backendEncryptorService";
+import AppProps from "./AppProps";
 
-function App() {
+const App: FC<AppProps> = ({serverUrl}) => {
     const [encrypt, setEncrypt] = useState(true);
-    const [encryptor,] = useState(new BackendEncryptorService('http://localhost:8080'));
+    const [encryptor,] = useState(new BackendEncryptorService(serverUrl));
     return (
         <Layout className={'h-window'}>
             <Content className={'container'}>
@@ -29,6 +30,6 @@ function App() {
             </Content>
         </Layout>
     );
-}
+};
 
 export default App;

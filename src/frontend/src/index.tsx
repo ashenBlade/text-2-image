@@ -6,9 +6,16 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+const serverUrl = process.env.REACT_APP_SERVER_URL;
+
+if (!serverUrl) {
+    throw new Error('Server url is not provided')
+}
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App serverUrl={serverUrl}/>
   </React.StrictMode>
 );
 

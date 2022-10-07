@@ -53,10 +53,12 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             const a = document.createElement('a');
             a.href = url;
             a.hidden = true;
+            a.download = 'file.png';
             a.type = 'download';
-            document.appendChild(a);
+            document.body.appendChild(a);
             a.click();
             document.removeChild(a);
+            URL.revokeObjectURL(url);
         }
         finally {
             setImageLoading(false);

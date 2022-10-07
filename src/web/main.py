@@ -1,5 +1,6 @@
 import logging
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,8 +17,8 @@ logging.basicConfig(
 
 
 def setup_middleware(fast_api: FastAPI) -> None:
-    if not fast_api.debug:
-        raise RuntimeError("Need to configure CORS for production")
+    # if not fast_api.debug:
+    #     raise RuntimeError("Need to configure CORS for production")
 
     fast_api.add_middleware(
         CORSMiddleware,
@@ -42,4 +43,9 @@ def create_app() -> FastAPI:
     return fast_api
 
 
+
+
 app = create_app()
+
+if __name__ == '__main__':
+    uvicorn.run(app, debug=True)
