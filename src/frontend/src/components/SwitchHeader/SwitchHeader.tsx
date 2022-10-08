@@ -30,7 +30,7 @@ const SwitchHeader: FC<SwitchHeaderProps> = ({onSwitch, fontSize: inputFontSize}
                     onSwitch?.(textToImage ? 'text' : 'image');
                 }}/>
                 <div>
-                    <FileImageOutlined style={iconStyle}/>
+                    <FileImageOutlined style={iconStyle} color={'rgb(0, 0, 255)'}/>
                 </div>
             </Space>
         </div>

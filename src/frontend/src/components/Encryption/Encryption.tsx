@@ -1,5 +1,5 @@
 import React, {FC, useState} from 'react';
-import {Button, Space, Upload} from "antd";
+import {Button, Image, Modal, Space, Upload} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
 import {FileTextOutlined} from "@ant-design/icons";
@@ -9,6 +9,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
+    const [image, setImage] = useState<Blob | null>(null);
 
     function isTextInput() {
         return selectedFile === null;
@@ -45,20 +46,21 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             let blob: Blob;
             try {
                 blob = await encryptor.encryptAsync(data);
+                setImage(blob);
             } catch (e) {
                 console.error('Could not encrypt image', e);
                 return;
             }
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.hidden = true;
-            a.download = 'file.png';
-            a.type = 'download';
-            document.body.appendChild(a);
-            a.click();
-            document.removeChild(a);
-            URL.revokeObjectURL(url);
+            // const url = URL.createObjectURL(blob);
+            // const a = document.createElement('a');
+            // a.href = url;
+            // a.hidden = true;
+            // a.download = 'file.png';
+            // a.type = 'download';
+            // document.body.appendChild(a);
+            // a.click();
+            // document.removeChild(a);
+            // URL.revokeObjectURL(url);
         }
         finally {
             setImageLoading(false);
@@ -121,6 +123,14 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     </Button>
                 </div>
             </div>
+            <Modal
+                closable={true}
+                centered={true}
+                open={image !== null}>
+                <Image src={image ? URL.createObjectURL(image) : ''}>
+
+                </Image>
+            </Modal>
         </div>
     );
 };

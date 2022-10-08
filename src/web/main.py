@@ -9,10 +9,10 @@ from .routers import image_to_text_router, text_to_image_router
 
 logging.basicConfig(
     format="%(asctime)s - "
-    "[%(levelname)s] -  "
-    "%(name)s - "
-    "%(filename)s.%(funcName)s - "
-    "%(message)s"
+           "[%(levelname)s] -  "
+           "%(name)s - "
+           "%(filename)s.%(funcName)s - "
+           "%(message)s"
 )
 
 

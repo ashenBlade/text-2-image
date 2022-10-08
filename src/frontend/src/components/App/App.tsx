@@ -1,5 +1,5 @@
 import React, {FC, useState} from 'react';
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.min.css';
 import {Layout} from "antd";
 import {Content} from "antd/es/layout/layout";
 import '../../common.css'
@@ -8,6 +8,7 @@ import Decryption from "../Decryption/Decryption";
 import SwitchHeader from "../SwitchHeader/SwitchHeader";
 import BackendEncryptorService from "../../services/backendEncryptorService";
 import AppProps from "./AppProps";
+import HalfArrow from "../HalfArrow/HalfArrow";
 
 const App: FC<AppProps> = ({serverUrl}) => {
     const [encrypt, setEncrypt] = useState(true);
@@ -21,6 +22,7 @@ const App: FC<AppProps> = ({serverUrl}) => {
                     <SwitchHeader onSwitch={newState => {
                         setEncrypt(newState === 'text')
                     }} fontSize={100}/>
+                    <HalfArrow></HalfArrow>
                 </div>
                 <div style={{height: '50vh'}}>
                     {encrypt
