@@ -1,0 +1,9 @@
+.switch-arrow {
+
+}
+
+.switch-arrow.selected {
+    transform: scale(1.1);
+    transition: scale 0.1s ease-in-out;
+    fill: black;
+}

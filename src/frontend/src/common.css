@@ -8,6 +8,10 @@
     transition: width 0.2s ease-in-out;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 @media (min-width: 576px) {
     .container {
         width: 576px;

@@ -5,10 +5,10 @@ import {Content} from "antd/es/layout/layout";
 import '../../common.css'
 import Encryption from "../Encryption/Encryption";
 import Decryption from "../Decryption/Decryption";
-import SwitchHeader from "../SwitchHeader/SwitchHeader";
+import Header from "../Header/Header";
 import BackendEncryptorService from "../../services/backendEncryptorService";
 import AppProps from "./AppProps";
-import HalfArrow from "../HalfArrow/HalfArrow";
+import HalfArrow from "../Header/SwitchArrows/HalfArrow/HalfArrow";
 
 const App: FC<AppProps> = ({serverUrl}) => {
     const [encrypt, setEncrypt] = useState(true);
@@ -19,10 +19,9 @@ const App: FC<AppProps> = ({serverUrl}) => {
                 <div style={{
                     margin: '50px'
                 }}>
-                    <SwitchHeader onSwitch={newState => {
+                    <Header onSwitch={newState => {
                         setEncrypt(newState === 'text')
                     }} fontSize={100}/>
-                    <HalfArrow></HalfArrow>
                 </div>
                 <div style={{height: '50vh'}}>
                     {encrypt
