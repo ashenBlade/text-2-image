@@ -16,7 +16,9 @@ const App: FC<AppProps> = ({serverUrl}) => {
             <Layout className={'h-window'}>
                 <Header>
                     <Menu className={'container'}
-                          defaultSelectedKeys={['fuck']} theme={'dark'} mode={'horizontal'}>
+                          defaultSelectedKeys={['fuck']}
+                          theme={'dark'}
+                          mode={'horizontal'}>
                         <Menu.Item>
                             <Link to={'/text/to/image'}>
                                 <span>Text to image</span>
