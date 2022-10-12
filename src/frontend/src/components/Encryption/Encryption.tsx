@@ -1,5 +1,5 @@
-import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
-import {Button, Layout, Menu, Space} from "antd";
+import React, {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Button, Image, Input, Layout, Menu, Modal, Space} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
 import {FileTextOutlined} from "@ant-design/icons";
@@ -14,8 +14,25 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [image, setImage] = useState<Blob | null>(null);
-    const inputFileRef = useRef<HTMLInputElement>(null);
     const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
+    const [imageFilename, setImageFilename] = useState('');
+    const [imgSrc, setImgSrc] = useState('')
+    const [showImageModal, setShowImageModal] = useState(false);
+    const inputFileRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        let url: string;
+        if (image) {
+            url = URL.createObjectURL(image)
+            setImgSrc(url)
+        }
+        return () => {
+            if (url) {
+                URL.revokeObjectURL(url)
+            }
+        }
+    }, [image])
+
 
     const imageExtensionsItemTypes = useMemo<ItemType[]>(
         () => Object.entries(ImageExtension)
@@ -72,18 +89,10 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             try {
                 blob = await encryptor.encryptAsync(data, chosenExtension);
                 setImage(blob);
+                setShowImageModal(true);
             } catch (e) {
                 console.error('Could not encrypt image', e);
-                return;
             }
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a')
-            a.href = url;
-            a.download = 'file.png'
-            document.body.appendChild(a)
-            a.click()
-            document.removeChild(a)
-            URL.revokeObjectURL(url)
         }
         finally {
             setImageLoading(false);
@@ -132,7 +141,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                 </Menu>
             </Sider>
             <Content style={{
-                padding: '0 10px'
+                paddingLeft: 10
             }}>
                 <div style={{
                     display: 'block',
@@ -185,6 +194,42 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     </div>
                 </div>
             </Content>
+            <Modal title={'Converted text'}
+                   open={showImageModal}
+                   okText={'Save'}
+                   onOk={e => {
+                       const a = document.createElement('a')
+                       a.href = imgSrc;
+                       a.download = `${imageFilename || 'converted'}.${chosenExtension}`;
+                       a.hidden = true;
+                       document.body.appendChild(a);
+                       a.click();
+                       document.body.removeChild(a);
+                       e.preventDefault();
+                       setShowImageModal(false);
+                   }}
+                   afterClose={() => {
+                       setImage(null);
+                       setSelectedFile(null);
+                   }}
+                   onCancel={() => {
+                       setShowImageModal(false);
+                   }}
+                   maskClosable={false}
+                   cancelText={'Cancel'}
+                   closable={false}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}>
+                    <Image src={imgSrc}
+                           alt={'Converted image preview'}/>
+                </div>
+                <Input type={'text'}
+                       value={imageFilename}
+                       placeholder={'Enter image filename'}
+                       onChange={e => setImageFilename(e.currentTarget.value)}/>
+            </Modal>
         </Layout>
     );
 };
