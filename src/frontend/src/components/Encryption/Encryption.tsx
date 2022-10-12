@@ -78,10 +78,12 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    marginTop: '10px'
                 }}>
                     <Button type={'primary'}
                             size={'large'}
+                            style={{
+                                margin: '10px'
+                            }}
                             onClick={encryptButtonOnClick}
                             disabled={imageLoading || (isTextInput() && !inputText)}>
                         Convert
