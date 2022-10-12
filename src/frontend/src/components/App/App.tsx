@@ -8,6 +8,7 @@ import Decryption from "../Decryption/Decryption";
 import BackendEncryptorService from "../../services/backendEncryptorService";
 import AppProps from "./AppProps";
 import {BrowserRouter, Link, Navigate, Route, Routes} from "react-router-dom";
+import {imageToTextPath, textToImagePath} from "./path";
 
 const App: FC<AppProps> = ({serverUrl}) => {
     const [encryptor,] = useState(new BackendEncryptorService(serverUrl));
@@ -20,37 +21,29 @@ const App: FC<AppProps> = ({serverUrl}) => {
                           theme={'dark'}
                           mode={'horizontal'}>
                         <Menu.Item>
-                            <Link to={'/text/to/image'}>
+                            <Link to={textToImagePath}>
                                 <span>Text to image</span>
                             </Link>
                         </Menu.Item>
                         <Menu.Item>
-                            <Link to={'/image/to/text'}>
+                            <Link to={imageToTextPath}>
                                 <span>Image to text</span>
                             </Link>
                         </Menu.Item>
                     </Menu>
                 </Header>
-                <Layout style={{
-                    padding: '24px'
+                <Content className={'container'} style={{
+                    backgroundColor: 'white',
+                    margin: '20px auto',
+                    // height: '100%',
+                    display: 'flex',
                 }}>
-                    <Content className={'container'} style={{
-                        backgroundColor: 'white',
-                        padding: '24px'
-                    }}>
-                        <div style={{
-                            margin: '50px'
-                        }}>
-                        </div>
-                        <div style={{height: '50vh'}}>
-                            <Routes>
-                                <Route path={'/text/to/image'} element={<Encryption encryptor={encryptor}/>}/>
-                                <Route path={'/image/to/text'} element={<Decryption/>}/>
-                                <Route path={'*'} element={<Navigate to={'/text/to/image'}/>}/>
-                            </Routes>
-                        </div>
-                    </Content>
-                </Layout>
+                    <Routes>
+                        <Route path={textToImagePath} element={<Encryption encryptor={encryptor}/>}/>
+                        <Route path={imageToTextPath} element={<Decryption/>}/>
+                        <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
+                    </Routes>
+                </Content>
             </Layout>
         </BrowserRouter>
     );
