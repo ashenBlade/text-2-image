@@ -1,4 +1,4 @@
-import EncryptorService from "../../abstractions/encryptorService";
+import EncryptorService from "../../domain/encryptorService";
 
 export default interface EncryptionProps {
     encryptor: EncryptorService

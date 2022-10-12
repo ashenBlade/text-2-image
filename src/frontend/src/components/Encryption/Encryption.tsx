@@ -1,11 +1,12 @@
 import React, {FC, useState} from 'react';
-import {Button, Layout, Menu, Space, Upload} from "antd";
+import {Button, Layout, Menu, Space} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
 import {FileTextOutlined} from "@ant-design/icons";
 import EncryptionProps from "./EncryptionProps";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
+import {ImageExtension} from "../../domain/imageExtension";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
@@ -47,7 +48,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         try {
             let blob: Blob;
             try {
-                blob = await encryptor.encryptAsync(data);
+                blob = await encryptor.encryptAsync(data, ImageExtension.PNG);
                 setImage(blob);
             } catch (e) {
                 console.error('Could not encrypt image', e);
@@ -75,22 +76,32 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                 backgroundColor: 'white',
                 width: 200
             }}>
-                <div style={{
+                <Space  direction={'vertical'} style={{
                     display: 'flex',
                     justifyContent: 'center',
+                    width: '100%',
+                    padding: 10
                 }}>
                     <Button type={'primary'}
                             size={'large'}
                             style={{
-                                margin: '10px'
+                                width: '100%',
                             }}
                             onClick={encryptButtonOnClick}
                             disabled={imageLoading || (isTextInput() && !inputText)}>
                         Convert
                     </Button>
-                </div>
+                    <Button type={'primary'}
+                            size={'large'}
+                            style={{
+                                width: '100%',
+                                backgroundColor: 'green',
+                                borderColor: 'green'
+                            }}>
+                        Upload file
+                    </Button>
+                </Space>
                 <Menu mode={'inline'}
-                      theme={'light'}
                       defaultSelectedKeys={['png']}>
                     <Menu.SubMenu title={'Extension'}>
                         <Menu.Item key={'png'}>
@@ -114,17 +125,16 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                 <div style={{
                     display: 'block',
                     justifyContent: 'center',
-                    height: '100%'
+                    height: '100%',
+                    backgroundColor: 'white'
                 }}>
-                    <Upload type={'drag'}
-                            multiple={false}
-                            onDrop={inputDivOnDrop}
-                            showUploadList={false}
-                            openFileDialogOnClick={false}
-                            maxCount={1}>
+                    <div onDrop={inputDivOnDrop} style={{
+                        height: '100%',
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}>
                         {isTextInput() ?
                             <TextArea placeholder={'Enter text or drag a file...'}
-                                      bordered={false}
                                       size={'large'}
                                       autoFocus={true}
                                       style={{
@@ -134,7 +144,9 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                       }}
                                       value={inputText}
                                       onChange={e => setInputText(e.currentTarget.value)}/>
-                            : <Space align={'center'} direction={'vertical'}>
+                            : <div style={{
+                                marginTop: '10px'
+                            }}><Space align={'center'} direction={'vertical'}>
                                 <FileTextOutlined style={{fontSize: '64px'}}/>
                                 <h3>{selectedFile?.name}</h3>
                                 <Button danger={true}
@@ -142,8 +154,36 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                         onClick={removeButtonOnClick}>
                                     Remove
                                 </Button>
-                            </Space>}
-                    </Upload>
+                            </Space></div>}
+                    </div>
+                    {/*<Upload type={'drag'}*/}
+                    {/*        multiple={false}*/}
+                    {/*        onDrop={inputDivOnDrop}*/}
+                    {/*        showUploadList={false}*/}
+                    {/*        openFileDialogOnClick={false}*/}
+                    {/*        maxCount={1}>*/}
+                    {/*    {isTextInput() ?*/}
+                    {/*        <TextArea placeholder={'Enter text or drag a file...'}*/}
+                    {/*                  bordered={false}*/}
+                    {/*                  size={'large'}*/}
+                    {/*                  autoFocus={true}*/}
+                    {/*                  style={{*/}
+                    {/*                      resize: 'none',*/}
+                    {/*                      height: '100%',*/}
+                    {/*                      width: '100%',*/}
+                    {/*                  }}*/}
+                    {/*                  value={inputText}*/}
+                    {/*                  onChange={e => setInputText(e.currentTarget.value)}/>*/}
+                    {/*        : <Space align={'center'} direction={'vertical'}>*/}
+                    {/*            <FileTextOutlined style={{fontSize: '64px'}}/>*/}
+                    {/*            <h3>{selectedFile?.name}</h3>*/}
+                    {/*            <Button danger={true}*/}
+                    {/*                    size={'large'}*/}
+                    {/*                    onClick={removeButtonOnClick}>*/}
+                    {/*                Remove*/}
+                    {/*            </Button>*/}
+                    {/*        </Space>}*/}
+                    {/*</Upload>*/}
                 </div>
             </Content>
         </Layout>
