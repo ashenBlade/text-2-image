@@ -90,7 +90,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     </Button>
                 </div>
                 <Menu mode={'inline'}
-                      theme={'light'} defaultSelectedKeys={['png']}>
+                      theme={'light'}
+                      defaultSelectedKeys={['png']}>
                     <Menu.SubMenu title={'Extension'}>
                         <Menu.Item key={'png'}>
                             PNG
