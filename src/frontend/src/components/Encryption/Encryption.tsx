@@ -89,10 +89,20 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                         Convert
                     </Button>
                 </div>
-                <Menu mode={'inline'} theme={'light'}>
-                    <Menu.SubMenu>
-                        <Menu.Item>
-                            1
+                <Menu mode={'inline'}
+                      theme={'light'} defaultSelectedKeys={['png']}>
+                    <Menu.SubMenu title={'Extension'}>
+                        <Menu.Item key={'png'}>
+                            PNG
+                        </Menu.Item>
+                        <Menu.Item key={'jpeg'}>
+                            JPEG
+                        </Menu.Item>
+                        <Menu.Item key={'jpg'}>
+                            JPG
+                        </Menu.Item>
+                        <Menu.Item key={'bmp'}>
+                            BMP
                         </Menu.Item>
                     </Menu.SubMenu>
                 </Menu>
@@ -128,8 +138,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                               width: '100%',
                                           }}
                                           value={inputText}
-                                          onChange={e => setInputText(e.currentTarget.value)
-                                          }/>
+                                          onChange={e => setInputText(e.currentTarget.value)}/>
                                 : <Space align={'center'} direction={'vertical'}>
                                     <FileTextOutlined style={{fontSize: '64px'}}/>
                                     <h3>{selectedFile?.name}</h3>
