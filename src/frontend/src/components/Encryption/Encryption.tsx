@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useCallback, useMemo, useRef, useState} from 'react';
 import {Button, Layout, Menu, Space} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
@@ -7,15 +7,37 @@ import EncryptionProps from "./EncryptionProps";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
 import {ImageExtension} from "../../domain/imageExtension";
+import {ItemType} from "antd/es/menu/hooks/useItems";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [image, setImage] = useState<Blob | null>(null);
+    const inputFileRef = useRef<HTMLInputElement>(null);
+    const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
+
+    const imageExtensionsItemTypes = useMemo<ItemType[]>(
+        () => Object.entries(ImageExtension)
+            .map(entries => {
+                const extension = entries[0];
+                const key = entries[1];
+                return {
+                    key: key,
+                    label: extension,
+                    onClick: () => {
+                        setChosenExtension(key);
+                    }
+                }
+            }), []);
 
     function isTextInput() {
         return selectedFile === null;
+    }
+
+    function uploadFileOnClick(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        inputFileRef.current?.click();
     }
 
     function inputDivOnDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -48,22 +70,20 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         try {
             let blob: Blob;
             try {
-                blob = await encryptor.encryptAsync(data, ImageExtension.PNG);
+                blob = await encryptor.encryptAsync(data, chosenExtension);
                 setImage(blob);
             } catch (e) {
                 console.error('Could not encrypt image', e);
                 return;
             }
-            // const url = URL.createObjectURL(blob);
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.hidden = true;
-            // a.download = 'file.png';
-            // a.type = 'download';
-            // document.body.appendChild(a);
-            // a.click();
-            // document.removeChild(a);
-            // URL.revokeObjectURL(url);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a')
+            a.href = url;
+            a.download = 'file.png'
+            document.body.appendChild(a)
+            a.click()
+            document.removeChild(a)
+            URL.revokeObjectURL(url)
         }
         finally {
             setImageLoading(false);
@@ -84,39 +104,31 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                 }}>
                     <Button type={'primary'}
                             size={'large'}
-                            style={{
-                                width: '100%',
-                            }}
+                            block={true}
                             onClick={encryptButtonOnClick}
-                            disabled={imageLoading || (isTextInput() && !inputText)}>
+                            disabled={imageLoading || (isTextInput() && !inputText)}
+                            loading={imageLoading}>
                         Convert
                     </Button>
                     <Button type={'primary'}
                             size={'large'}
+                            block={true}
                             style={{
-                                width: '100%',
-                                backgroundColor: 'green',
-                                borderColor: 'green'
-                            }}>
+                                backgroundColor: imageLoading || !isTextInput() ? '#f5f5f5' : 'green',
+                                borderColor: imageLoading || !isTextInput() ? '#d9d9d9' : 'green',
+                            }}
+                            onClick={uploadFileOnClick}
+                            disabled={imageLoading || !isTextInput()}>
                         Upload file
                     </Button>
                 </Space>
                 <Menu mode={'inline'}
-                      defaultSelectedKeys={['png']}>
-                    <Menu.SubMenu title={'Extension'}>
-                        <Menu.Item key={'png'}>
-                            PNG
-                        </Menu.Item>
-                        <Menu.Item key={'jpeg'}>
-                            JPEG
-                        </Menu.Item>
-                        <Menu.Item key={'jpg'}>
-                            JPG
-                        </Menu.Item>
-                        <Menu.Item key={'bmp'}>
-                            BMP
-                        </Menu.Item>
-                    </Menu.SubMenu>
+                      defaultSelectedKeys={[ImageExtension.PNG]}
+                      items={[{
+                          label: 'Extension',
+                          children: imageExtensionsItemTypes,
+                          key: 'extension',
+                      }]}>
                 </Menu>
             </Sider>
             <Content style={{
@@ -133,6 +145,19 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                         display: 'flex',
                         justifyContent: 'center'
                     }}>
+                        <input type={'file'}
+                               multiple={false}
+                               hidden={true}
+                               style={{
+                                   display: 'none'
+                               }}
+                               ref={inputFileRef}
+                               onChange={e => {
+                                   e.preventDefault();
+                                   if (e.target.files?.[0]) {
+                                       setSelectedFile(e.target.files[0])
+                                   }
+                               }}/>
                         {isTextInput() ?
                             <TextArea placeholder={'Enter text or drag a file...'}
                                       size={'large'}
@@ -146,44 +171,18 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                       onChange={e => setInputText(e.currentTarget.value)}/>
                             : <div style={{
                                 marginTop: '10px'
-                            }}><Space align={'center'} direction={'vertical'}>
-                                <FileTextOutlined style={{fontSize: '64px'}}/>
-                                <h3>{selectedFile?.name}</h3>
-                                <Button danger={true}
-                                        size={'large'}
-                                        onClick={removeButtonOnClick}>
-                                    Remove
-                                </Button>
-                            </Space></div>}
+                            }}>
+                                <Space align={'center'} direction={'vertical'}>
+                                    <FileTextOutlined style={{fontSize: '64px'}}/>
+                                    <h3>{selectedFile?.name}</h3>
+                                    <Button danger={true}
+                                            size={'large'}
+                                            onClick={removeButtonOnClick}>
+                                        Remove
+                                    </Button>
+                                </Space>
+                            </div>}
                     </div>
-                    {/*<Upload type={'drag'}*/}
-                    {/*        multiple={false}*/}
-                    {/*        onDrop={inputDivOnDrop}*/}
-                    {/*        showUploadList={false}*/}
-                    {/*        openFileDialogOnClick={false}*/}
-                    {/*        maxCount={1}>*/}
-                    {/*    {isTextInput() ?*/}
-                    {/*        <TextArea placeholder={'Enter text or drag a file...'}*/}
-                    {/*                  bordered={false}*/}
-                    {/*                  size={'large'}*/}
-                    {/*                  autoFocus={true}*/}
-                    {/*                  style={{*/}
-                    {/*                      resize: 'none',*/}
-                    {/*                      height: '100%',*/}
-                    {/*                      width: '100%',*/}
-                    {/*                  }}*/}
-                    {/*                  value={inputText}*/}
-                    {/*                  onChange={e => setInputText(e.currentTarget.value)}/>*/}
-                    {/*        : <Space align={'center'} direction={'vertical'}>*/}
-                    {/*            <FileTextOutlined style={{fontSize: '64px'}}/>*/}
-                    {/*            <h3>{selectedFile?.name}</h3>*/}
-                    {/*            <Button danger={true}*/}
-                    {/*                    size={'large'}*/}
-                    {/*                    onClick={removeButtonOnClick}>*/}
-                    {/*                Remove*/}
-                    {/*            </Button>*/}
-                    {/*        </Space>}*/}
-                    {/*</Upload>*/}
                 </div>
             </Content>
         </Layout>
