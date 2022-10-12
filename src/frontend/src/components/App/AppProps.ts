@@ -1,3 +1,5 @@
+import EncryptorService from "../../domain/encryptorService";
+
 export default interface AppProps {
-    serverUrl: string
+    encryptor: EncryptorService
 }

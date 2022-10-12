@@ -2,20 +2,32 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
+import BackendEncryptorService from "./services/backendEncryptorService";
+import EmptyEncryptorService from "./services/emptyEncryptorService";
+import EncryptorService from "./domain/encryptorService";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-if (!serverUrl) {
-    throw new Error('Server url is not provided')
+let encryptor: EncryptorService;
+
+if (process.env.REACT_APP_USE_STUBS) {
+    encryptor = new EmptyEncryptorService();
+} else {
+    const serverUrl = process.env.REACT_APP_SERVER_URL;
+
+    if (!serverUrl) {
+        throw new Error('Server url is not provided')
+    }
+    encryptor = new BackendEncryptorService(serverUrl);
 }
+
 
 root.render(
   <React.StrictMode>
-    <App serverUrl={serverUrl}/>
+    <App encryptor={encryptor}/>
   </React.StrictMode>
 );
 

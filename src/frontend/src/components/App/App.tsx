@@ -5,13 +5,11 @@ import {Content, Header} from "antd/es/layout/layout";
 import '../../common.css'
 import Encryption from "../Encryption/Encryption";
 import Decryption from "../Decryption/Decryption";
-import BackendEncryptorService from "../../services/backendEncryptorService";
 import AppProps from "./AppProps";
 import {BrowserRouter, Link, Navigate, Route, Routes} from "react-router-dom";
 import {imageToTextPath, textToImagePath} from "./path";
 
-const App: FC<AppProps> = ({serverUrl}) => {
-    const [encryptor,] = useState(new BackendEncryptorService(serverUrl));
+const App: FC<AppProps> = ({encryptor}) => {
     return (
         <BrowserRouter>
             <Layout className={'h-window'}>
