@@ -84,6 +84,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         try {
             try {
                 updateImageUrl(await encryptor.encryptAsync(data, chosenExtension))
+                setImageFilename(`${selectedFile?.name || 'encrypted'}`)
                 setShowImageModal(true);
             } catch (e) {
                 console.error('Could not encrypt image', e);
@@ -210,7 +211,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                    }}
 
                    afterClose={() => {
-                       tearDownFiles()
+                       tearDownFiles();
+                       setImageFilename('');
                    }}
 
                    maskClosable={false}
