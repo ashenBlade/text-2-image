@@ -1,8 +1,8 @@
-import React, {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import {Button, Image, Input, Layout, Menu, Modal, Space} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
-import {FileTextOutlined} from "@ant-design/icons";
+import {UploadOutlined} from "@ant-design/icons";
 import EncryptionProps from "./EncryptionProps";
 import {Content} from "antd/es/layout/layout";
 import Sider from "antd/es/layout/Sider";
@@ -13,26 +13,16 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
-    const [image, setImage] = useState<Blob | null>(null);
     const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
     const [imageFilename, setImageFilename] = useState('');
-    const [imgSrc, setImgSrc] = useState('')
+    const [imageUrl, setImageUrl] = useState('')
     const [showImageModal, setShowImageModal] = useState(false);
     const inputFileRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        let url: string;
-        if (image) {
-            url = URL.createObjectURL(image)
-            setImgSrc(url)
-        }
-        return () => {
-            if (url) {
-                URL.revokeObjectURL(url)
-            }
-        }
-    }, [image])
-
+    const updateImageUrl = (blob: Blob) => {
+        URL.revokeObjectURL(imageUrl);
+        setImageUrl(URL.createObjectURL(blob));
+    }
 
     const imageExtensionsItemTypes = useMemo<ItemType[]>(
         () => Object.entries(ImageExtension)
@@ -50,6 +40,14 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
 
     function isTextInput() {
         return selectedFile === null;
+    }
+
+    function tearDownFiles() {
+        setImageUrl('');
+        setSelectedFile(null);
+        if (inputFileRef.current) {
+            inputFileRef.current.value = '';
+        }
     }
 
     function uploadFileOnClick(e: React.MouseEvent<HTMLButtonElement>) {
@@ -70,7 +68,6 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     }
 
     function removeButtonOnClick(e: React.MouseEvent<HTMLElement, MouseEvent>) {
-        e.bubbles = false;
         e.preventDefault();
         setSelectedFile(null);
     }
@@ -85,10 +82,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         }
         setImageLoading(true);
         try {
-            let blob: Blob;
             try {
-                blob = await encryptor.encryptAsync(data, chosenExtension);
-                setImage(blob);
+                updateImageUrl(await encryptor.encryptAsync(data, chosenExtension))
                 setShowImageModal(true);
             } catch (e) {
                 console.error('Could not encrypt image', e);
@@ -182,7 +177,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                 marginTop: '10px'
                             }}>
                                 <Space align={'center'} direction={'vertical'}>
-                                    <FileTextOutlined style={{fontSize: '64px'}}/>
+                                    <UploadOutlined style={{fontSize: '64px'}}/>
                                     <h3>{selectedFile?.name}</h3>
                                     <Button danger={true}
                                             size={'large'}
@@ -199,7 +194,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                    okText={'Save'}
                    onOk={e => {
                        const a = document.createElement('a')
-                       a.href = imgSrc;
+                       a.href = imageUrl;
                        a.download = `${imageFilename || 'converted'}.${chosenExtension}`;
                        a.hidden = true;
                        document.body.appendChild(a);
@@ -208,21 +203,23 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                        e.preventDefault();
                        setShowImageModal(false);
                    }}
-                   afterClose={() => {
-                       setImage(null);
-                       setSelectedFile(null);
-                   }}
+
+                   cancelText={'Cancel'}
                    onCancel={() => {
                        setShowImageModal(false);
                    }}
+
+                   afterClose={() => {
+                       tearDownFiles()
+                   }}
+
                    maskClosable={false}
-                   cancelText={'Cancel'}
                    closable={false}>
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center'
                 }}>
-                    <Image src={imgSrc}
+                    <Image src={imageUrl}
                            alt={'Converted image preview'}/>
                 </div>
                 <Input type={'text'}
