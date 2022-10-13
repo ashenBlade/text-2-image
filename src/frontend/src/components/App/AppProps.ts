@@ -1,5 +1,7 @@
-import EncryptorService from "../../domain/encryptorService";
+import EncryptService from "../../domain/encryptService";
+import DecryptService from "../../domain/decryptService";
 
 export default interface AppProps {
-    encryptor: EncryptorService
+    encryptor: EncryptService,
+    decryptor: DecryptService
 }

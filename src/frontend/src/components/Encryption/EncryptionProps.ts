@@ -1,5 +1,5 @@
-import EncryptorService from "../../domain/encryptorService";
+import EncryptService from "../../domain/encryptService";
 
 export default interface EncryptionProps {
-    encryptor: EncryptorService
+    encryptor: EncryptService
 }

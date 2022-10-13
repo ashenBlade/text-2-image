@@ -1,7 +1,7 @@
-import EncryptorService from "../domain/encryptorService";
+import EncryptService from "../domain/encryptService";
 import {ImageExtension} from "../domain/imageExtension";
 
-export default class BackendEncryptorService implements EncryptorService {
+export default class BackendEncryptorService implements EncryptService {
     constructor(readonly serverUrl: string) {  }
 
     async encryptAsync(data: string, extension: ImageExtension): Promise<Blob> {
@@ -14,5 +14,4 @@ export default class BackendEncryptorService implements EncryptorService {
         });
         return await result.blob();
     }
-
 }

@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC} from 'react';
 import 'antd/dist/antd.min.css';
 import {Layout, Menu} from "antd";
 import {Content, Header} from "antd/es/layout/layout";
@@ -9,7 +9,7 @@ import AppProps from "./AppProps";
 import {BrowserRouter, Link, Navigate, Route, Routes} from "react-router-dom";
 import {imageToTextPath, textToImagePath} from "./path";
 
-const App: FC<AppProps> = ({encryptor}) => {
+const App: FC<AppProps> = ({encryptor, decryptor}) => {
     return (
         <BrowserRouter>
             <Layout className={'h-window'}>
@@ -38,7 +38,7 @@ const App: FC<AppProps> = ({encryptor}) => {
                 }}>
                     <Routes>
                         <Route path={textToImagePath} element={<Encryption encryptor={encryptor}/>}/>
-                        <Route path={imageToTextPath} element={<Decryption/>}/>
+                        <Route path={imageToTextPath} element={<Decryption decryptor={decryptor}/>}/>
                         <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                     </Routes>
                 </Content>

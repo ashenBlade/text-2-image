@@ -4,14 +4,15 @@ import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
 import BackendEncryptorService from "./services/backendEncryptorService";
 import EmptyEncryptorService from "./services/emptyEncryptorService";
-import EncryptorService from "./domain/encryptorService";
+import EncryptService from "./domain/encryptService";
+import EmptyDecryptService from "./services/emptyDecryptService";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 
-let encryptor: EncryptorService;
+let encryptor: EncryptService;
 
 if (process.env.REACT_APP_USE_STUBS) {
     encryptor = new EmptyEncryptorService();
@@ -27,7 +28,7 @@ if (process.env.REACT_APP_USE_STUBS) {
 
 root.render(
   <React.StrictMode>
-    <App encryptor={encryptor}/>
+    <App encryptor={encryptor} decryptor={new EmptyDecryptService()}/>
   </React.StrictMode>
 );
 
