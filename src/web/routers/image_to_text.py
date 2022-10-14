@@ -41,7 +41,9 @@ async def post__image_to_text(
     try:
         image = image_loader.load(io)
         return PlainTextResponse(
-            image.text, status_code=HTTPStatus.OK, media_type="text/plain"
+            image.text,
+            status_code=HTTPStatus.OK,
+            media_type="text/plain"
         )
     except (ValueError, UnicodeDecodeError):
         raise HTTPException(

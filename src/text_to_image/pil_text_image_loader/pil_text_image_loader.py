@@ -1,8 +1,13 @@
-from typing import BinaryIO
+from typing import BinaryIO, Generator, Iterable
 
 from text_to_image import TextImage
 from text_to_image.domain.text_image_loader import TextImageLoader
 from PIL import Image as PILImage
+
+def _flatten_pixels(pixels: Iterable[tuple[int, ...]]) -> Generator[int, None, None]:
+    pixel: tuple[int, ...]
+    for pixel in pixels:
+        yield from pixel
 
 
 class PilTextImageLoader(TextImageLoader):
@@ -14,5 +19,5 @@ class PilTextImageLoader(TextImageLoader):
 
     def load(self, fd: BinaryIO) -> TextImage:
         pil_image = PILImage.open(fd)
-        loaded = pil_image.tobytes()
-        return TextImage(loaded.rstrip(b"\0"))
+        image_data = pil_image.getdata()
+        return TextImage(bytes(_flatten_pixels(image_data)).rstrip(b"\0"))
