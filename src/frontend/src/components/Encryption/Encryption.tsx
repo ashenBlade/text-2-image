@@ -36,13 +36,13 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     }
                 }
             }), []);
-
     const defaultSelectedKeys = useMemo<string[]>(() => ([ImageExtension.PNG]), [])
     const menuItems = useMemo<ItemType[]>(() => [{
         label: 'Extension',
         children: imageExtensionsItemTypes,
         key: 'extension',
     }], [imageExtensionsItemTypes])
+
     function isTextInput() {
         return selectedFile === null;
     }

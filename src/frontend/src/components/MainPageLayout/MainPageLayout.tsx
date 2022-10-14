@@ -19,10 +19,10 @@ const MainPageLayout: FC<MainPageLayoutProps> = ({actionButtons, defaultSelected
                            padding: 10
                        }}>
                     {actionButtons}
-                    <Menu mode={'inline'}
-                          defaultSelectedKeys={defaultSelectedMenuKeys}
-                          items={menuItems}/>
                 </Space>
+                <Menu mode={'inline'}
+                      defaultSelectedKeys={defaultSelectedMenuKeys}
+                      items={menuItems}/>
             </Sider>
             <Content style={{
                 marginLeft: 10,
