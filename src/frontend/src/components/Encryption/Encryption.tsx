@@ -123,7 +123,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             </Button>
         ]}
         menuItems={menuItems}
-        defaultSelectedMenuKeys={defaultSelectedKeys}>
+        selectedMenuKeys={defaultSelectedKeys}>
             <div style={{
                 display: 'block',
                 justifyContent: 'center',

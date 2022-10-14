@@ -4,7 +4,12 @@ import Sider from "antd/es/layout/Sider";
 import {MainPageLayoutProps} from "./MainPageLayoutProps";
 import {Content} from "antd/es/layout/layout";
 
-const MainPageLayout: FC<MainPageLayoutProps> = ({actionButtons, defaultSelectedMenuKeys, menuItems, children}) => {
+const MainPageLayout: FC<MainPageLayoutProps> = (
+    {
+        actionButtons,
+        selectedMenuKeys,
+        menuItems,
+        children}) => {
     return (
         <Layout>
             <Sider style={{
@@ -21,7 +26,7 @@ const MainPageLayout: FC<MainPageLayoutProps> = ({actionButtons, defaultSelected
                     {actionButtons}
                 </Space>
                 <Menu mode={'inline'}
-                      defaultSelectedKeys={defaultSelectedMenuKeys}
+                      selectedKeys={selectedMenuKeys}
                       items={menuItems}/>
             </Sider>
             <Content style={{

@@ -29,6 +29,19 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
         };
     }, [uploadedFile]);
 
+    function updateChosenImageExtension(file: File) {
+        const extension = file.name.split('.').pop();
+        if (!extension) {
+            console.warn('Could not detect file extension. Extension is empty');
+            return;
+        }
+        console.log('fuck')
+
+        const extensionLower = extension.toLowerCase();
+        if (Object.values(ImageExtension).some(ext => ext === extensionLower)) {
+            setChosenExtension(extensionLower as ImageExtension)
+        }
+    }
 
     const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
 
@@ -46,7 +59,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                 }
             }), []);
 
-    const defaultSelectedKeys = useMemo<string[]>(() => ([ImageExtension.PNG]), [])
+    const selectedKeys = useMemo<string[]>(() => ([chosenExtension]), [chosenExtension])
     const menuItems = useMemo<ItemType[]>(() => [{
         label: 'Extension',
         children: imageExtensionsItemTypes,
@@ -66,6 +79,10 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
             setShowModal(true);
         } catch (e) {
             console.error(e);
+            Modal.error({
+                title: 'Could not convert image to text',
+                content: 'Error while sending request'
+            })
         } finally {
             setIsDecrypting(false);
         }
@@ -80,15 +97,20 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                     disabled={isDecrypting || uploadedFile === null}>
                 Decrypt
             </Button>
-        ]} defaultSelectedMenuKeys={defaultSelectedKeys}
+        ]}
+                        selectedMenuKeys={selectedKeys}
                         menuItems={menuItems}>
             <Dragger multiple={false}
-                     maxCount={1}
+                     maxCount={0}
                      beforeUpload={f => {
                          setUploadedFile(f);
+                         updateChosenImageExtension(f);
                          return false;
                      }}
-
+                     style={{
+                         padding: 10
+                     }}
+                     showUploadList={false}
                      onDrop={e => {
                          e.preventDefault();
                          const files = e.dataTransfer.files;
@@ -99,10 +121,11 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                              return;
                          }
                          if (files[0]) {
-                             console.log('gay')
+                             updateChosenImageExtension(files[0])
                              setUploadedFile(files[0]);
                          }}}>
-                {uploadedFile === null ? <>
+                {uploadedFile === null
+                    ? <>
                         <p className={'ant-upload-drag-icon'}>
                             <UploadOutlined/>
                         </p>
@@ -130,18 +153,36 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                     </>}
             </Dragger>
             <Modal open={showModal}
+                   title={'Decrypted'}
+
+                   okText={'Save'}
                    onOk={() => {
-                       setShowModal(false)
+                       const a = document.createElement('a');
+                       a.href = uploadedFileUrl;
+                       a.download = `${uploadedFile?.name ?? 'decrypted'}.txt`;
+                       a.hidden = true;
+                       document.body.appendChild(a);
+                       a.click();
+                       document.body.removeChild(a);
+                       setShowModal(false);
                    }}
-                   onCancel={() => setShowModal(false)}>
+
+                   afterClose={() => {
+                       setUploadedFile(null);
+                   }}
+
+                   cancelText={'Close'}
+                   onCancel={() => {
+                       setShowModal(false);
+                   }}>
                 {convertedText !== undefined &&
                     <TextArea readOnly={true}
                               style={{
                                   resize: 'none',
                                   width: '100%',
-                                  height: '100%'
+                                  height: '100%',
                               }}
-                              value={convertedText}></TextArea>
+                              value={convertedText}/>
                 }
             </Modal>
         </MainPageLayout>

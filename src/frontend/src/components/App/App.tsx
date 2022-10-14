@@ -33,12 +33,11 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                 <Content className={'container'} style={{
                     backgroundColor: 'white',
                     margin: '20px auto',
-                    // height: '100%',
                     display: 'flex',
                 }}>
                     <Routes>
-                        <Route path={textToImagePath} element={<Encryption encryptor={encryptor}/>}/>
-                        <Route path={imageToTextPath} element={<Decryption decryptor={decryptor}/>}/>
+                        <Route path={textToImagePath} shouldRevalidate={() => false} element={<Encryption encryptor={encryptor}/>}/>
+                        <Route path={imageToTextPath} shouldRevalidate={() => false} element={<Decryption decryptor={decryptor}/>}/>
                         <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                     </Routes>
                 </Content>

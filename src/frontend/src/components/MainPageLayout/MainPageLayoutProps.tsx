@@ -4,6 +4,6 @@ import {ItemType} from "antd/es/menu/hooks/useItems";
 export interface MainPageLayoutProps {
     actionButtons?: React.ReactNode[]
     menuItems?: ItemType[]
-    defaultSelectedMenuKeys?: string[]
+    selectedMenuKeys?: string[]
     children?: ReactNode | ReactNode[]
 }
