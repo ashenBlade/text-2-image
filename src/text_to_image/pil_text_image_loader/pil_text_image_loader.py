@@ -4,6 +4,7 @@ from text_to_image import TextImage
 from text_to_image.domain.text_image_loader import TextImageLoader
 from PIL import Image as PILImage
 
+
 def _flatten_pixels(pixels: Iterable[tuple[int, ...]]) -> Generator[int, None, None]:
     pixel: tuple[int, ...]
     for pixel in pixels:

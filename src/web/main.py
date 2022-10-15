@@ -17,9 +17,6 @@ logging.basicConfig(
 
 
 def setup_middleware(fast_api: FastAPI) -> None:
-    # if not fast_api.debug:
-    #     raise RuntimeError("Need to configure CORS for production")
-
     fast_api.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -41,8 +38,6 @@ def create_app() -> FastAPI:
     setup_routers(fast_api)
 
     return fast_api
-
-
 
 
 app = create_app()
