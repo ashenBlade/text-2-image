@@ -1,8 +1,8 @@
 import React, {FC, useMemo, useRef, useState} from 'react';
-import {Button, Image, Input, Modal, Space} from "antd";
+import {Button, Image, Input, Modal} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
-import {UploadOutlined} from "@ant-design/icons";
+import {FileTextOutlined} from "@ant-design/icons";
 import EncryptionProps from "./EncryptionProps";
 import {ImageExtension} from "../../domain/imageExtension";
 import {ItemType} from "antd/es/menu/hooks/useItems";
@@ -159,18 +159,22 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                   }}
                                   value={inputText}
                                   onChange={e => setInputText(e.currentTarget.value)}/>
-                        : <div style={{
-                            marginTop: '10px'
-                        }}>
-                            <Space align={'center'} direction={'vertical'}>
-                                <UploadOutlined style={{fontSize: '64px'}}/>
-                                <h3>{selectedFile?.name}</h3>
-                                <Button danger={true}
-                                        size={'large'}
-                                        onClick={removeButtonOnClick}>
-                                    Remove
-                                </Button>
-                            </Space>
+                        : <div className={'ant-upload-drag ant-upload'}>
+                            <span className={'ant-upload-btn ant-upload'}>
+                                <div className={'ant-upload-drag-container'}>
+                                    <p className={'ant-upload-drag-icon'}>
+                                        <FileTextOutlined/>
+                                    </p>
+                                    <p className={'ant-upload-text'}>
+                                        {selectedFile?.name}
+                                    </p>
+                                    <Button danger={true}
+                                            size={'large'}
+                                            onClick={removeButtonOnClick}>
+                                        Remove
+                                    </Button>
+                                </div>
+                            </span>
                         </div>}
                 </div>
             </div>

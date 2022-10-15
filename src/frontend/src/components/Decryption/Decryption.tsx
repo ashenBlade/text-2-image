@@ -136,7 +136,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                     : <>
                         <p className={'ant-upload-drag-icon'}>
                             <Image src={uploadedFileUrl}
-                                   alt={'Uploaded file preview'} onClick={e => e.stopPropagation()}/>
+                                   alt={'Uploaded file preview'}
+                                   onClick={e => e.stopPropagation()}/>
                         </p>
                         <p className={'ant-upload-text'}>
                             {uploadedFile.name}
