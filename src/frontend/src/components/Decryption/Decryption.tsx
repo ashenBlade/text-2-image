@@ -7,7 +7,7 @@ import TextArea from "antd/es/input/TextArea";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {UploadOutlined} from "@ant-design/icons";
 import Dragger from "antd/es/upload/Dragger";
-
+import './Decryption.tsx.css'
 
 const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [isDecrypting, setIsDecrypting] = useState(false);
@@ -28,6 +28,10 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
             }
         };
     }, [uploadedFile]);
+
+    function isFileUploaded() {
+        return uploadedFile !== null;
+    }
 
     function updateChosenImageExtension(file: File) {
         const extension = file.name.split('.').pop();
@@ -108,7 +112,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                          return false;
                      }}
                      style={{
-                         padding: 10
+                         padding: 10,
+                         objectFit: 'scale-down'
                      }}
                      showUploadList={false}
                      onDrop={e => {
@@ -124,7 +129,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                              updateChosenImageExtension(files[0])
                              setUploadedFile(files[0]);
                          }}}>
-                {uploadedFile === null
+                {!isFileUploaded()
                     ? <>
                         <p className={'ant-upload-drag-icon'}>
                             <UploadOutlined/>
@@ -133,16 +138,22 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                             Click or drag file here
                         </p>
                     </>
-                    : <>
-                        <p className={'ant-upload-drag-icon'}>
+                    : <div style={{objectFit: 'scale-down'}}>
+                        <div className={'ant-upload-drag-icon'}>
                             <Image src={uploadedFileUrl}
                                    alt={'Uploaded file preview'}
+                                   style={{
+                                       maxHeight: '50%',
+                                       height: '50%',
+                                       width: '90%'
+                                       // width: 'auto'
+                                    }}
                                    onClick={e => e.stopPropagation()}/>
-                        </p>
+                        </div>
                         <p className={'ant-upload-text'}>
-                            {uploadedFile.name}
+                            {uploadedFile!.name}
                         </p>
-                        <p>
+                        <div>
                             <Button danger={true}
                                     onClick={e => {
                                         e.stopPropagation();
@@ -150,8 +161,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                                     }}>
                                 Remove file
                             </Button>
-                        </p>
-                    </>}
+                        </div>
+                    </div>}
             </Dragger>
             <Modal open={showModal}
                    title={'Decrypted'}
@@ -175,13 +186,14 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                    cancelText={'Close'}
                    onCancel={() => {
                        setShowModal(false);
-                   }}>
+                   }}
+                   maskClosable={false}>
                 {convertedText !== undefined &&
                     <TextArea readOnly={true}
+                              className={'modal-height-adaptive'}
                               style={{
                                   resize: 'none',
-                                  width: '100%',
-                                  height: '100%',
+                                  height: '50vh'
                               }}
                               value={convertedText}/>
                 }
