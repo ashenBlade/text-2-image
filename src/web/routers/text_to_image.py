@@ -6,17 +6,11 @@ from fastapi import APIRouter, Form, HTTPException, Depends
 from starlette.responses import StreamingResponse, Response
 
 from text_to_image import TextImage, TextImageSaver
-from web.dependencies import get_text_image_saver
+from web.dependencies import get_text_image_saver_factory, TextImageSaverFactory
 
 router = APIRouter()
 
 text_to_image_logger = logging.getLogger(__name__)
-
-SUPPORTED_IMAGE_EXTENSIONS = {"png"}
-
-
-def is_image_extension_supported(image_extension: str) -> bool:
-    return image_extension.lower() in SUPPORTED_IMAGE_EXTENSIONS
 
 
 def write_image_to_bytes_io(text: str, image_saver: TextImageSaver) -> BytesIO:
@@ -40,7 +34,7 @@ def write_image_to_bytes_io(text: str, image_saver: TextImageSaver) -> BytesIO:
 async def post__text_to_image(
     text: str = Form(),
     image_extension: str = Form("png"),
-    image_saver: TextImageSaver = Depends(get_text_image_saver),
+    image_saver_factory: TextImageSaverFactory = Depends(get_text_image_saver_factory),
 ) -> Response:
     if not len(text):
         raise HTTPException(
@@ -48,10 +42,17 @@ async def post__text_to_image(
             detail="Input text must not be empty"
         )
 
-    if not is_image_extension_supported(image_extension):
+    try:
+        image_saver = image_saver_factory(image_extension)
+    except KeyError as key_error:
+        text_to_image_logger.warning(
+            'Could not create image saver for extension: %s',
+            image_extension,
+            exc_info=key_error
+        )
         raise HTTPException(
             status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
-            detail=f"Image extension '{image_extension}' is not supported",
+            detail=f'Provided extension is not supported'
         )
 
     text_to_image_logger.info("Convert of string with length: %i", len(text))
