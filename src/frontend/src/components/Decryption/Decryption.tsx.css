@@ -1,3 +1,19 @@
-.modal-screen-adaptive {
-    height: 400px;
+.preview-image {
+    max-height: 400px;
+    max-width: 400px;
 }
+
+@media (max-width: 768px) or (max-height: 600px) {
+    .preview-image {
+        max-height: 500px;
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 992px) or (max-height: 992px) {
+    .preview-image {
+        max-height: 700px;
+        max-width: 700px;
+    }
+}
+
