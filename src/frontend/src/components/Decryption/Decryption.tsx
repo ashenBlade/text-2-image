@@ -142,14 +142,6 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         <Image src={uploadedFileUrl}
                                alt={'Uploaded file preview'}
                                className={'preview-image'}
-                               // style={{
-                               //     maxHeight: '600px',
-                               //     // height: '50%',
-                               //     width: '100%',
-                               //     maxWidth: '600px',
-                               //     height: '100%'
-                               //     // width: 'auto'
-                               // }}
                                onClick={e => e.stopPropagation()}/>
                         <p className={'ant-upload-text'}>
                             {uploadedFile!.name}
