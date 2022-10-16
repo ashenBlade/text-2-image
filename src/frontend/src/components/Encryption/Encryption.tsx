@@ -36,7 +36,6 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     }
                 }
             }), []);
-    const defaultSelectedKeys = useMemo<string[]>(() => ([ImageExtension.PNG]), [])
     const menuItems = useMemo<ItemType[]>(() => [{
         label: 'Extension',
         children: imageExtensionsItemTypes,
@@ -123,7 +122,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             </Button>
         ]}
         menuItems={menuItems}
-        selectedMenuKeys={defaultSelectedKeys}>
+        selectedMenuKeys={[chosenExtension]}>
             <div style={{
                 display: 'block',
                 justifyContent: 'center',
