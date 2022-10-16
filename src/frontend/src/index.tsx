@@ -7,6 +7,7 @@ import EmptyEncryptorService from "./services/emptyEncryptorService";
 import EncryptService from "./domain/encryptService";
 import EmptyDecryptService from "./services/emptyDecryptService";
 import BackendDecryptService from "./services/backendDecryptService";
+import {BrowserRouter} from "react-router-dom";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -45,8 +46,10 @@ const decryptor = getDecryptor();
 
 root.render(
   <React.StrictMode>
-    <App encryptor={encryptor}
-         decryptor={decryptor}/>
+      <BrowserRouter>
+          <App encryptor={encryptor}
+              decryptor={decryptor}/>
+      </BrowserRouter>
   </React.StrictMode>
 );
 
