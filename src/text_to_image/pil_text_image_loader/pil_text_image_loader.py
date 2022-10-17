@@ -19,6 +19,8 @@ class PilTextImageLoader(TextImageLoader):
         self.encoding = encoding
 
     def load(self, fd: BinaryIO) -> TextImage:
-        pil_image = PILImage.open(fd)
+        print(self.format)
+
+        pil_image = PILImage.open(fd, mode='r', formats=(self.format,))
         image_data = pil_image.getdata()
         return TextImage(bytes(_flatten_pixels(image_data)).rstrip(b"\0"))

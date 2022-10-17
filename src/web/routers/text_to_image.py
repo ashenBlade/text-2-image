@@ -33,9 +33,14 @@ def write_image_to_bytes_io(text: str, image_saver: TextImageSaver) -> BytesIO:
 @router.post("/api/text/to/image", response_class=StreamingResponse)
 async def post__text_to_image(
     text: str = Form(),
-    image_extension: str = Form("png"),
+    image_extension: str = Form(),
     image_saver_factory: TextImageSaverFactory = Depends(get_text_image_saver_factory),
 ) -> Response:
+    if not image_extension:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Image extension is not provided'
+        )
     if not len(text):
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,

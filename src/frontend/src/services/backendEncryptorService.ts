@@ -7,7 +7,7 @@ export default class BackendEncryptorService implements EncryptService {
     async encryptAsync(data: string, extension: ImageExtension): Promise<Blob> {
         const formData = new FormData();
         formData.set('text', data);
-        formData.set('extension', extension);
+        formData.set('image_extension', extension);
         const result = await fetch(`${this.serverUrl}/api/text/to/image`, {
             method: 'POST',
             body: formData

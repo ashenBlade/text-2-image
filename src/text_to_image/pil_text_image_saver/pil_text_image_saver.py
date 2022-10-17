@@ -15,7 +15,9 @@ class PilTextImageSaver(TextImageSaver, ABC):
         self.image_mode = mode
 
     def save(self, fd: BinaryIO, image: TextImage) -> None:
-        pil_image = PILImage.new(mode=self.image_mode, size=image.size, color=(0, 0, 0))
+        pil_image = PILImage.new(mode=self.image_mode,
+                                 size=image.size,
+                                 color=(0, 0, 0))
 
         def flattened_image_data() -> Generator[tuple[int, int, int], None, None]:
             it = iter(image.data)
@@ -31,8 +33,8 @@ class PilTextImageSaver(TextImageSaver, ABC):
                     # incorrect data-pixel alignment
                     if first:
                         yield first, (second or 0), (third or 0)
-
                     break
 
         pil_image.putdata(list(flattened_image_data()))
-        pil_image.save(fd, format=self.format)
+        print(self.format)
+        pil_image.save(fd, format=self.format, bitmap_format='png')
