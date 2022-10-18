@@ -50,7 +50,8 @@ async def post__image_to_text(
             status_code=HTTPStatus.OK,
             media_type="text/plain"
         )
-    except (ValueError, UnicodeDecodeError):
+    except (ValueError, UnicodeDecodeError) as error:
+        logger.warning('Error during converting image', exc_info=error)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Could not convert given image to text",
