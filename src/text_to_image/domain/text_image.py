@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from functools import cached_property
-from typing import Iterable, SupportsIndex
+from typing import Iterable, SupportsIndex, Generator
 
 
 class TextImage:
@@ -32,3 +32,20 @@ class TextImage:
     @classmethod
     def from_text(cls, text: str, encoding: str = DEFAULT_ENCODING) -> TextImage:
         return cls(text.encode(encoding=encoding), encoding)
+
+    @property
+    def pixels(self) -> Generator[tuple[int, int, int], None, None]:
+        it = iter(self.data)
+        first, second, third = None, None, None
+        while True:
+            try:
+                first = next(it)
+                second = next(it)
+                third = next(it)
+                yield first, second, third
+                first, second, third = None, None, None
+            except StopIteration:
+                # incorrect data-pixel alignment
+                if first is not None:
+                    yield first, (second or 0), (third or 0)
+                break
