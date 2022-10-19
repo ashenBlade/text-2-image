@@ -1,19 +1,26 @@
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useMemo, useRef, useState} from 'react';
 import '../../common.css';
 import EncryptionProps from "./EncryptionProps";
-import {ImageExtension} from "../../domain/imageExtension";
+import {ImageFormat} from "../../domain/imageFormat";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
-import {Button, Input, Modal} from "@mui/material";
+import {Button, FormControl, Input, InputLabel, MenuItem, Modal, Select} from "@mui/material";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
-    const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
+    const [chosenImageFormat, setChosenImageFormat] = useState(ImageFormat.PNG);
     const [imageFilename, setImageFilename] = useState('');
     const [imageUrl, setImageUrl] = useState('')
     const [showImageModal, setShowImageModal] = useState(false);
+
     const inputFileRef = useRef<HTMLInputElement>(null);
+
+    const imageFormatsMenuItems = useMemo(() => Object.values(ImageFormat).map(imageFormat => (
+        <MenuItem value={imageFormat}>
+            {imageFormat}
+        </MenuItem>
+    )), []);
 
     const updateImageUrl = (blob: Blob) => {
         URL.revokeObjectURL(imageUrl);
@@ -23,15 +30,6 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     function isTextInput() {
         return selectedFile === null;
     }
-
-    function tearDownFiles() {
-        setImageUrl('');
-        setSelectedFile(null);
-        if (inputFileRef.current) {
-            inputFileRef.current.value = '';
-        }
-    }
-
     function uploadFileOnClick(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         inputFileRef.current?.click();
@@ -65,7 +63,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         setImageLoading(true);
         try {
             try {
-                updateImageUrl(await encryptor.encryptAsync(data, chosenExtension))
+                updateImageUrl(await encryptor.encryptAsync(data, chosenImageFormat))
                 setImageFilename(`${selectedFile?.name || 'encrypted'}`)
                 setShowImageModal(true);
             } catch (e) {
@@ -80,19 +78,37 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     return (
         <MainPageLayout actionButtons={[
             <Button onClick={encryptButtonOnClick}
+                    variant={'contained'}
+                    color={'success'}
+                    style={{
+                        marginBottom: 5
+                    }}
                     disabled={imageLoading || (isTextInput() && !inputText)}>
                 Convert
             </Button>,
-            <Button style={{
-                        backgroundColor: imageLoading || !isTextInput() ? '#f5f5f5' : 'green',
-                        borderColor: imageLoading || !isTextInput() ? '#d9d9d9' : 'green',
+            <Button onClick={uploadFileOnClick}
+                    variant={'outlined'}
+                    color={'info'}
+                    style={{
+                        marginBottom: 10
                     }}
-                    onClick={uploadFileOnClick}
                     disabled={imageLoading || !isTextInput()}>
                 Upload file
-            </Button>
+            </Button>,
+            <FormControl fullWidth={true}>
+                <InputLabel>Image format</InputLabel>
+                <Select color={'info'}
+                        variant={'outlined'}
+                        multiple={false}
+                        label={'Image format'}
+                        defaultValue={'png'}
+                        value={chosenImageFormat}
+                        onChange={e => setChosenImageFormat(e.target.value as ImageFormat)}>
+                    {imageFormatsMenuItems}
+                </Select>
+            </FormControl>
         ]}
-        selectedMenuKeys={[chosenExtension]}>
+        selectedMenuKeys={[chosenImageFormat]}>
             <div style={{
                 display: 'flex',
                 justifyContent: 'center',
@@ -125,6 +141,9 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                       resize: 'none',
                                       height: 'auto',
                                       width: '100%',
+                                      borderColor: 'gray',
+                                      borderRadius: '3px',
+                                      padding: 5
                                   }}
                                   value={inputText}
                                   onChange={e => setInputText(e.currentTarget.value)}/>
@@ -151,6 +170,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                         display: 'flex',
                         justifyContent: 'center'
                     }}>
+                        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
                         <img src={imageUrl} alt={'Converted image preview'}/>
                     </div>
                     <Input type={'text'}
