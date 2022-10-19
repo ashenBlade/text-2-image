@@ -197,7 +197,16 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     </DialogContent>
                     <DialogActions>
                         <Button color={'error'} onClick={() => setShowImageModal(false)}>Close</Button>
-                        <Button onClick={() => setShowImageModal(false)}>Save</Button>
+                        <Button onClick={() => {
+                            const a = document.createElement('a')
+                            a.href = createdImageUrl;
+                            a.download = imageFilename;
+                            a.type = 'download';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setShowImageModal(false);
+                        }}>Save</Button>
                     </DialogActions>
 
             </Dialog>
