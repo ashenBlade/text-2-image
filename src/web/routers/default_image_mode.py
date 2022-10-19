@@ -1,3 +1,3 @@
 from text_to_image import ImageMode
 
-DEFAULT_IMAGE_ENCODE_FORMAT: ImageMode = 'RGB'
+DEFAULT_IMAGE_MODE: ImageMode = 'RGB'

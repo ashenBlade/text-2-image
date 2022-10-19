@@ -7,7 +7,8 @@ from fastapi import APIRouter, Form, HTTPException
 from starlette.responses import StreamingResponse, Response
 
 from text_to_image import TextImage, ImageMode
-from web.routers.default_image_mode import DEFAULT_IMAGE_ENCODE_FORMAT
+from web.routers.default_image_mode import DEFAULT_IMAGE_MODE
+from web.routers.is_image_extension_supported import is_image_extension_supported
 
 text_to_image_router = APIRouter()
 
@@ -53,7 +54,13 @@ def get_image_file_bytes(image: Image.Image, image_extension: str = 'png') -> By
 async def post__text_to_image(
         text: str = Form(),
         image_extension: str = Form()) -> Response:
-    image = to_image(text, DEFAULT_IMAGE_ENCODE_FORMAT)
+    if not is_image_extension_supported(image_extension):
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Requested image extension is not supported'
+        )
+
+    image = to_image(text, DEFAULT_IMAGE_MODE)
     file_content = get_image_file_bytes(image, image_extension=image_extension)
     return StreamingResponse(
         content=file_content,
