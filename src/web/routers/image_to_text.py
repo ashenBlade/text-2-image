@@ -9,7 +9,7 @@ from starlette.responses import PlainTextResponse, Response
 
 from text_to_image import TextImage
 
-router = APIRouter()
+image_to_text_router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
@@ -35,7 +35,7 @@ def get_text_image(content: bytes, image_extension: str) -> TextImage:
         )
 
 
-@router.post("/api/image/to/text", response_class=PlainTextResponse)
+@image_to_text_router.post("/api/image/to/text", response_class=PlainTextResponse)
 async def post__image_to_text(
         file: UploadFile = File(),
         image_extension: str = Form(default=None,

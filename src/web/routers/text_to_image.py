@@ -1,20 +1,16 @@
 import logging
 from http import HTTPStatus
 from io import BytesIO
-from typing import TypeAlias, Literal
 
 from PIL import Image
 from fastapi import APIRouter, Form, HTTPException
 from starlette.responses import StreamingResponse, Response
 
-from text_to_image import TextImage
+from text_to_image import TextImage, ImageMode
 
-router = APIRouter()
+text_to_image_router = APIRouter()
 
 text_to_image_logger = logging.getLogger(__name__)
-ImageMode: TypeAlias = Literal[
-    "1", "CMYK", "F", "HSV", "I", "L", "LAB", "P", "RGB", "RGBA", "RGBX", "YCbCr"
-]
 DEFAULT_IMAGE_ENCODE_FORMAT: ImageMode = 'RGB'
 
 
@@ -53,7 +49,7 @@ def get_image_file_bytes(image: Image.Image, image_extension: str = 'png') -> By
     return buffer
 
 
-@router.post("/api/text/to/image", response_class=StreamingResponse)
+@text_to_image_router.post("/api/text/to/image", response_class=StreamingResponse)
 async def post__text_to_image(
         text: str = Form(),
         image_extension: str = Form()) -> Response:
