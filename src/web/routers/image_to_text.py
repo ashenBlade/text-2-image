@@ -4,7 +4,7 @@ from io import BytesIO
 
 import PIL
 from PIL import Image
-from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Form
+from fastapi import APIRouter, File, UploadFile, HTTPException, Form
 from starlette.responses import PlainTextResponse, Response
 
 from text_to_image import TextImage
