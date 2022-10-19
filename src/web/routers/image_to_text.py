@@ -2,56 +2,67 @@ import logging
 from http import HTTPStatus
 from io import BytesIO
 
-from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+import PIL
+from PIL import Image
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Form
 from starlette.responses import PlainTextResponse, Response
 
-from web.dependencies import get_text_image_loader_factory, TextImageLoaderFactory
-
+from text_to_image import TextImage
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+def get_text_image(content: bytes, image_extension: str) -> TextImage:
+    with BytesIO(content) as io:
+        try:
+            image = Image.open(io, mode='r', formats=(image_extension,))
+        except PIL.UnidentifiedImageError as unidentified_error:
+            logger.warning('Error during file decode', exc_info=unidentified_error)
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail='Could not open image in specified format'
+            )
+
+        pixels = image.getdata()
+        in_pixel = bytes(
+            byte
+            for pixel in pixels
+            for byte in pixel
+        ).rstrip(b'\0')
+        return TextImage(
+            in_pixel
+        )
+
+
 @router.post("/api/image/to/text", response_class=PlainTextResponse)
 async def post__image_to_text(
-    file: UploadFile = File(),
-    text_image_loader_factory: TextImageLoaderFactory = Depends(get_text_image_loader_factory),
-) -> Response:
-    if not file:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="Image file not provided"
-        )
-
-    extension = file.content_type.split('/')[-1]
-    try:
-        image_loader = text_image_loader_factory(extension)
-    except KeyError as key_error:
-        logger.warning('Could not create image loader for file with content type: %s',
-                       file.content_type,
-                       exc_info=key_error)
-        raise HTTPException(
-            status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
-            detail=f'Image with given extension is not supported'
-        )
-
+        file: UploadFile = File(),
+        image_extension: str = Form(default=None,
+                                    alias='imageFormat')) -> Response:
     file_bytes = await file.read()
 
     if not len(file_bytes):
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST, detail="Provided image file is empty"
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Provided image file is empty'
         )
 
-    io = BytesIO(file_bytes)
+    if image_extension:
+        extension = image_extension
+    else:
+        extension = file.content_type.split('/')[-1]
 
     try:
-        image = image_loader.load(io)
+        image = get_text_image(file_bytes, extension)
         return PlainTextResponse(
             image.text,
             status_code=HTTPStatus.OK,
             media_type="text/plain"
         )
     except (ValueError, UnicodeDecodeError) as error:
-        logger.warning('Error during converting image', exc_info=error)
+        logger.warning('Error during converting image',
+                       exc_info=error)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail="Could not convert given image to text",
