@@ -7,32 +7,32 @@ from PIL import Image
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
 from starlette.responses import PlainTextResponse, Response
 
-from text_to_image import TextImage
-from web.routers.is_image_extension_supported import is_image_extension_supported
+from text_to_image import TextImage, ImageFormat
 
 image_to_text_router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-def get_extension(file: UploadFile, image_extension: str):
+def get_image_format(file: UploadFile, image_extension: str) -> ImageFormat:
     if image_extension:
         extension = image_extension
     else:
         extension = file.content_type.split('/')[-1]
 
-    if not is_image_extension_supported(extension):
+    try:
+        return ImageFormat.from_string(extension)
+    except ValueError as value_error:
+        logger.warning('Could not get ImageFormat from provided extension', exc_info=value_error)
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Requested image extension is not supported'
         )
 
-    return extension
 
-
-def get_text_image(content: bytes, image_extension: str) -> TextImage:
+def get_text_image(content: bytes, image_format: ImageFormat) -> TextImage:
     with BytesIO(content) as io:
         try:
-            image = Image.open(io, mode='r', formats=(image_extension,))
+            image = Image.open(io, mode='r', formats=(image_format,))
         except PIL.UnidentifiedImageError as unidentified_error:
             logger.warning('Error during file decode', exc_info=unidentified_error)
             raise HTTPException(
@@ -41,14 +41,14 @@ def get_text_image(content: bytes, image_extension: str) -> TextImage:
             )
 
         pixels = image.getdata()
-        data = bytes(
+        encoded_text = bytes(
             byte
             for pixel in pixels
             for byte in pixel
         ).rstrip(b'\0')
 
         return TextImage(
-            data
+            encoded_text
         )
 
 
@@ -58,8 +58,8 @@ async def post__image_to_text(
         image_extension: str = Form(default=None,
                                     alias='imageFormat')) -> Response:
     file_bytes = await read_upload_file(file)
-    extension = get_extension(file, image_extension)
-    image = get_text_image(file_bytes, extension)
+    image_format = get_image_format(file, image_extension)
+    image = get_text_image(file_bytes, image_format)
     text = read_text_from_image(image)
     return PlainTextResponse(
         text,

@@ -6,9 +6,8 @@ from PIL import Image
 from fastapi import APIRouter, Form, HTTPException
 from starlette.responses import StreamingResponse, Response
 
-from text_to_image import TextImage, ImageMode
+from text_to_image import TextImage, ImageMode, ImageFormat
 from web.routers.default_image_mode import DEFAULT_IMAGE_MODE
-from web.routers.is_image_extension_supported import is_image_extension_supported
 
 text_to_image_router = APIRouter()
 
@@ -32,12 +31,11 @@ def to_image(text: str, image_mode: ImageMode) -> Image.Image:
     return pil_image
 
 
-def get_image_file_bytes(image: Image.Image, image_extension: str = 'png') -> BytesIO:
+def get_image_file_bytes(image: Image.Image, image_format: ImageFormat) -> BytesIO:
     buffer = BytesIO()
     try:
         image.save(buffer,
-                   format=image_extension,
-                   save_all=True,
+                   format=image_format,
                    lossless=True)
     except KeyError as key_error:
         logger.warning('Requested saving image with not supported image extension',
@@ -50,18 +48,24 @@ def get_image_file_bytes(image: Image.Image, image_extension: str = 'png') -> By
     return buffer
 
 
+def get_image_format(image_extension: str) -> ImageFormat:
+    try:
+        return ImageFormat.from_string(image_extension)
+    except ValueError as value_error:
+        logger.warning('Could not get ImageFormat from ImageExtension: %s', image_extension, exc_info=value_error)
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Provided image format is not supported'
+        )
+
+
 @text_to_image_router.post("/api/text/to/image", response_class=StreamingResponse)
 async def post__text_to_image(
         text: str = Form(),
-        image_extension: str = Form()) -> Response:
-    if not is_image_extension_supported(image_extension):
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail='Requested image extension is not supported'
-        )
-
+        image_extension: str = Form(default='png')) -> Response:
+    image_format = get_image_format(image_extension)
     image = to_image(text, DEFAULT_IMAGE_MODE)
-    file_content = get_image_file_bytes(image, image_extension=image_extension)
+    file_content = get_image_file_bytes(image, image_format)
     return StreamingResponse(
         content=file_content,
         media_type=f"image/{image_extension.lower()}",

@@ -8,9 +8,12 @@ class ImageFormat(str, Enum):
     @classmethod
     def from_string(cls, format: str) -> 'ImageFormat':
         try:
-            return {
-                ImageFormat.PNG: ImageFormat.PNG,
-                ImageFormat.WEBP: ImageFormat.WEBP
-            }[format.strip().lower()]  # type: ignore
+            return _SUPPORTED_EXTENSIONS_DICT[format.strip().lower()]
         except KeyError as key_error:
             raise ValueError('Given format is not supported', format) from key_error
+
+
+_SUPPORTED_EXTENSIONS_DICT: dict[str, ImageFormat] = {
+    ImageFormat.PNG: ImageFormat.PNG,
+    ImageFormat.WEBP: ImageFormat.WEBP
+}
