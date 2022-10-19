@@ -3,7 +3,15 @@ import '../../common.css';
 import EncryptionProps from "./EncryptionProps";
 import {ImageFormat} from "../../domain/imageFormat";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
-import {Button, FormControl, Input, InputLabel, MenuItem, Modal, Select} from "@mui/material";
+import {
+    Button,
+    Dialog, DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl, InputLabel,
+    MenuItem,
+    Select, TextField
+} from "@mui/material";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
@@ -11,7 +19,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [imageLoading, setImageLoading] = useState(false);
     const [chosenImageFormat, setChosenImageFormat] = useState(ImageFormat.PNG);
     const [imageFilename, setImageFilename] = useState('');
-    const [imageUrl, setImageUrl] = useState('')
+    const [createdImageUrl, setCreatedImageUrl] = useState('')
     const [showImageModal, setShowImageModal] = useState(false);
 
     const inputFileRef = useRef<HTMLInputElement>(null);
@@ -23,8 +31,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     )), []);
 
     const updateImageUrl = (blob: Blob) => {
-        URL.revokeObjectURL(imageUrl);
-        setImageUrl(URL.createObjectURL(blob));
+        URL.revokeObjectURL(createdImageUrl);
+        setCreatedImageUrl(URL.createObjectURL(blob));
     }
 
     function isTextInput() {
@@ -164,21 +172,34 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                         </div>}
                 </div>
             </div>
-            <Modal open={showImageModal}>
-                <>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center'
-                    }}>
-                        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
-                        <img src={imageUrl} alt={'Converted image preview'}/>
-                    </div>
-                    <Input type={'text'}
-                           value={imageFilename}
+            <Dialog open={showImageModal}
+                    fullWidth={true}>
 
-                           placeholder={'Enter image filename'}
-                           onChange={e => setImageFilename(e.currentTarget.value)}/></>
-            </Modal>
+                    <DialogTitle>
+                        Converted text
+                    </DialogTitle>
+
+                    <DialogContent>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}>
+                            {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
+                            <img src={createdImageUrl} alt={'Converted image preview'}/>
+                        </div>
+                        <TextField type={'text'}
+                                   value={imageFilename}
+                                   placeholder={'Enter image filename'}
+                                   onChange={e => setImageFilename(e.currentTarget.value)}
+                                   label={'Filename'}
+                                   style={{marginTop: 20}}/>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button color={'error'} onClick={() => setShowImageModal(false)}>Close</Button>
+                        <Button onClick={() => setShowImageModal(false)}>Save</Button>
+                    </DialogActions>
+
+            </Dialog>
         </MainPageLayout>
     );
 };
