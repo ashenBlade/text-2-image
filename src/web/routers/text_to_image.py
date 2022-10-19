@@ -7,19 +7,19 @@ from fastapi import APIRouter, Form, HTTPException
 from starlette.responses import StreamingResponse, Response
 
 from text_to_image import TextImage, ImageMode
+from web.routers.default_image_mode import DEFAULT_IMAGE_ENCODE_FORMAT
 
 text_to_image_router = APIRouter()
 
-text_to_image_logger = logging.getLogger(__name__)
-DEFAULT_IMAGE_ENCODE_FORMAT: ImageMode = 'RGB'
+logger = logging.getLogger(__name__)
 
 
 def to_image(text: str, image_mode: ImageMode) -> Image.Image:
     try:
         text_image = TextImage.from_text(text)
     except UnicodeEncodeError as unicode_encode_error:
-        text_to_image_logger.warning('Could not create TextImage from text',
-                                     exc_info=unicode_encode_error)
+        logger.warning('Could not create TextImage from text',
+                       exc_info=unicode_encode_error)
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Error during encoding provided text'
@@ -39,8 +39,8 @@ def get_image_file_bytes(image: Image.Image, image_extension: str = 'png') -> By
                    save_all=True,
                    lossless=True)
     except KeyError as key_error:
-        text_to_image_logger.warning('Requested saving image with not supported image extension',
-                                     exc_info=key_error)
+        logger.warning('Requested saving image with not supported image extension',
+                       exc_info=key_error)
         raise HTTPException(
             status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
             detail='Requested image format is not supported'
