@@ -1,5 +1,4 @@
 from .text_image import TextImage
-from .text_image_saver import TextImageSaver
-from .text_image_loader import TextImageLoader
+from .image_mode import ImageMode
 
-__all__ = ("TextImage", "TextImageSaver", "TextImageLoader")
+__all__ = ("TextImage", "ImageMode")
