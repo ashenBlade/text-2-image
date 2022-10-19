@@ -4,13 +4,12 @@ import EncryptionProps from "./EncryptionProps";
 import {ImageFormat} from "../../domain/imageFormat";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
 import {
-    Button,
     Dialog, DialogActions,
-    DialogContent,
-    DialogTitle,
-    FormControl, InputLabel,
-    MenuItem,
-    Select, TextField
+    DialogContent, TextField,
+    InputLabel,
+    Button, DialogTitle,
+    FormControl, MenuItem,
+    Select,
 } from "@mui/material";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
@@ -72,7 +71,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         try {
             try {
                 updateImageUrl(await encryptor.encryptAsync(data, chosenImageFormat))
-                setImageFilename(`${selectedFile?.name || 'encrypted'}`)
+                setImageFilename(`${selectedFile?.name || 'converted'}.${chosenImageFormat}`)
                 setShowImageModal(true);
             } catch (e) {
                 console.error('Could not encrypt image', e);
@@ -188,8 +187,10 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                             <img src={createdImageUrl} alt={'Converted image preview'}/>
                         </div>
                         <TextField type={'text'}
+                                   fullWidth={true}
+                                   variant={'standard'}
                                    value={imageFilename}
-                                   placeholder={'Enter image filename'}
+                                   placeholder={'converted.png'}
                                    onChange={e => setImageFilename(e.currentTarget.value)}
                                    label={'Filename'}
                                    style={{marginTop: 20}}/>
