@@ -13,14 +13,14 @@ image_to_text_router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-def get_image_format(file: UploadFile, image_extension: str) -> ImageFormat:
-    if image_extension:
-        extension = image_extension
+def get_image_format(file: UploadFile, user_provided_extension: str | None) -> ImageFormat:
+    if user_provided_extension:
+        extension = user_provided_extension
     else:
         extension = file.content_type.split('/')[-1]
 
     try:
-        return ImageFormat.from_string(extension)
+        return ImageFormat.parse(extension)
     except ValueError as value_error:
         logger.warning('Could not get ImageFormat from provided extension', exc_info=value_error)
         raise HTTPException(
@@ -40,16 +40,13 @@ def get_text_image(content: bytes, image_format: ImageFormat) -> TextImage:
                 detail='Could not open image in specified format'
             )
 
-        pixels = image.getdata()
         encoded_text = bytes(
             byte
-            for pixel in pixels
+            for pixel in image.getdata()
             for byte in pixel
         ).rstrip(b'\0')
 
-        return TextImage(
-            encoded_text
-        )
+        return TextImage(encoded_text)
 
 
 @image_to_text_router.post("/api/image/to/text", response_class=PlainTextResponse)
@@ -57,10 +54,10 @@ async def post__image_to_text(
         file: UploadFile = File(),
         image_extension: str = Form(default=None,
                                     alias='imageFormat')) -> Response:
-    file_bytes = await read_upload_file(file)
     image_format = get_image_format(file, image_extension)
-    image = get_text_image(file_bytes, image_format)
-    text = read_text_from_image(image)
+    file_bytes = await read_upload_file(file)
+    text_image = get_text_image(file_bytes, image_format)
+    text = decode_text(text_image)
     return PlainTextResponse(
         text,
         status_code=HTTPStatus.OK,
@@ -68,7 +65,7 @@ async def post__image_to_text(
     )
 
 
-def read_text_from_image(image: TextImage) -> str:
+def decode_text(image: TextImage) -> str:
     try:
         text = image.text
     except (ValueError, UnicodeDecodeError) as error:
