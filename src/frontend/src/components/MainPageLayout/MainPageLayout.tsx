@@ -1,46 +1,37 @@
-export {}
-// import React, {FC} from 'react';
-// import {Layout, Menu, Space} from "antd";
-// import Sider from "antd/es/layout/Sider";
-// import {MainPageLayoutProps} from "./MainPageLayoutProps";
-// import {Content} from "antd/es/layout/layout";
-//
-// const MainPageLayout: FC<MainPageLayoutProps> = (
-//     {
-//         actionButtons,
-//         selectedMenuKeys,
-//         menuItems,
-//         children}) => {
-//     return (
-//         <Layout>
-//             <Sider style={{
-//                 backgroundColor: 'white',
-//                 width: 200
-//             }}>
-//                 <Space direction={'vertical'}
-//                        style={{
-//                            display: 'flex',
-//                            justifyContent: 'center',
-//                            width: '100%',
-//                            padding: 10
-//                        }}>
-//                     {actionButtons}
-//                 </Space>
-//                 <Menu mode={'inline'}
-//                       selectedKeys={selectedMenuKeys}
-//                       items={menuItems}/>
-//             </Sider>
-//             <Content style={{
-//                 marginLeft: 10,
-//                 display: 'block',
-//                 justifyContent: 'center',
-//                 height: '100%',
-//                 backgroundColor: 'white'
-//             }}>
-//                 {children}
-//             </Content>
-//         </Layout>
-//     );
-// };
-//
-// export default MainPageLayout;
+import React, {FC} from 'react';
+import {MainPageLayoutProps} from "./MainPageLayoutProps";
+import {Box} from "@mui/material";
+
+const MainPageLayout: FC<MainPageLayoutProps> = (
+    {actionButtons,
+        children}) => {
+    return (
+        <Box style={{
+            display: 'grid',
+            gridTemplateColumns: '200px 1fr',
+            gridTemplateRows: '1fr',
+            width: '100%',
+            height: '100%'
+        }}>
+            <Box style={{
+                display: 'flex',
+                flexFlow: 'column wrap',
+                width: 200,
+            }}>
+                {actionButtons}
+            </Box>
+            <Box style={{
+                marginLeft: 10,
+                display: 'flex',
+                justifyContent: 'center',
+                height: '100%',
+                backgroundColor: 'white',
+                flex: '1 1 auto',
+            }}>
+                {children}
+            </Box>
+        </Box>
+    );
+};
+
+export default MainPageLayout;

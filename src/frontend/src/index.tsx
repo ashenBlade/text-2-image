@@ -8,9 +8,12 @@ import EmptyDecryptService from "./services/emptyDecryptService";
 import BackendDecryptService from "./services/backendDecryptService";
 import {BrowserRouter} from "react-router-dom";
 
+const rootElement = document.getElementById('root');
+rootElement!.style.height = '100%';
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  rootElement as HTMLElement
 );
+
 
 
 function getEncryptor() {
