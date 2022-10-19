@@ -4,7 +4,6 @@ import App from './components/App/App';
 import reportWebVitals from './reportWebVitals';
 import BackendEncryptorService from "./services/backendEncryptorService";
 import EmptyEncryptorService from "./services/emptyEncryptorService";
-import EncryptService from "./domain/encryptService";
 import EmptyDecryptService from "./services/emptyDecryptService";
 import BackendDecryptService from "./services/backendDecryptService";
 import {BrowserRouter} from "react-router-dom";
