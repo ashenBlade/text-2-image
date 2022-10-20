@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useRef, useState} from 'react';
 import {DecryptionProps} from "./DecryptionProps";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
 import {ImageFormat} from "../../domain/imageFormat";
@@ -10,6 +10,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [convertedText, setConvertedText] = useState<string>();
     const [showModal, setShowModal] = useState(false);
+
+    const inputRef = useRef<HTMLInputElement>(null);
 
     function isFileUploaded() {
         return uploadedFile !== null;
@@ -48,6 +50,18 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
         }
     }
 
+    const inputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        if (e.target.files?.length === 1) {
+            const file = e.target.files[0];
+            setUploadedFile(file);
+        }
+    }
+
+    const clickInput = () => {
+        inputRef.current?.click();
+    }
+
     return (
         <MainPageLayout actionButtons={[
             <Button variant={'contained'}
@@ -71,6 +85,11 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                          setUploadedFile(file);
                      }
                  }}>
+                <input type={'file'}
+                       multiple={false}
+                       ref={inputRef}
+                       onChange={inputOnChange}
+                       hidden={true}/>
                 <div style={{
                     border: 'gray dashed 1px',
                     borderRadius: 5,
@@ -104,9 +123,11 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                             </Button>
 
                         </div>
-                        : <p>
-                            File not chosen
-                        </p>}
+                        : <Button variant={'outlined'}
+                                  color={'info'}
+                                  onClick={clickInput}>
+                            Choose file
+                        </Button>}
                 </div>
             </div>
             <Dialog open={showModal}>
