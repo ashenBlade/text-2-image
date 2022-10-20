@@ -11,6 +11,7 @@ import {
     FormControl, MenuItem,
     Select,
 } from "@mui/material";
+import {Upload} from "@mui/icons-material";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
@@ -154,20 +155,34 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                   }}
                                   value={inputText}
                                   onChange={e => setInputText(e.currentTarget.value)}/>
-                        : <div className={'ant-upload-drag ant-upload'}>
-                            <span className={'ant-upload-btn ant-upload'}>
-                                <div className={'ant-upload-drag-container'}>
-                                    <p className={'ant-upload-drag-icon'}>
-
-                                    </p>
-                                    <p className={'ant-upload-text'}>
-                                        {selectedFile?.name}
-                                    </p>
-                                    <Button onClick={removeButtonOnClick}>
-                                        Remove
-                                    </Button>
-                                </div>
-                            </span>
+                        : <div style={{
+                            textAlign: 'center',
+                            border: 'gray dashed 1px',
+                            borderRadius: 3,
+                            display: 'flex',
+                            flex: '1 1 auto',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flexFlow: 'column wrap'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Upload color={'info'}
+                                        fontSize={'large'}
+                                        fillRule={'nonzero'}
+                                        width={100}/>
+                                <span>
+                                    {selectedFile?.name}
+                                </span>
+                            </div>
+                            <Button color={'error'}
+                                    onClick={removeButtonOnClick}
+                                    variant={'outlined'}>
+                                Remove
+                            </Button>
                         </div>}
                 </div>
             </div>
