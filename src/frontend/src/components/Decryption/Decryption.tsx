@@ -1,37 +1,51 @@
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {DecryptionProps} from "./DecryptionProps";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
 import {ImageFormat} from "../../domain/imageFormat";
 import './Decryption.tsx.css'
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextareaAutosize} from "@mui/material";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle, FormControl,
+    InputLabel, MenuItem,
+    Select,
+    TextareaAutosize
+} from "@mui/material";
 
 const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [isDecrypting, setIsDecrypting] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [convertedText, setConvertedText] = useState<string>();
     const [showModal, setShowModal] = useState(false);
+    const [chosenImageFormat, setChosenImageFormat] = useState(ImageFormat.PNG);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const textareaModalRef = useRef<HTMLTextAreaElement>(null);
+
+    const imageFormats = useMemo(() => Object.values(ImageFormat), []);
+    const imageFormatsMenuItems = useMemo(() => Object.values(ImageFormat).map(imageFormat => (
+        <MenuItem value={imageFormat}>
+            {imageFormat}
+        </MenuItem>
+    )), []);
 
     function isFileUploaded() {
         return uploadedFile !== null;
     }
 
-    function updateChosenImageExtension(file: File) {
-        const extension = file.name.split('.').pop();
-        if (!extension) {
-            console.warn('Could not detect file extension. Extension is empty');
-            return;
+    useEffect(() => {
+        if (uploadedFile && uploadedFile.type.startsWith('image')) {
+            const type = uploadedFile.type.split('/')[1];
+            const index = imageFormats.indexOf(type as ImageFormat);
+            if (index !== -1) {
+                setChosenImageFormat(imageFormats[index]);
+            }
         }
+    }, [uploadedFile, imageFormats]);
 
-        const extensionLower = extension.toLowerCase();
-        if (Object.values(ImageFormat).some(ext => ext === extensionLower)) {
-            setChosenExtension(extensionLower as ImageFormat)
-        }
-    }
 
-    const [chosenExtension, setChosenExtension] = useState(ImageFormat.PNG);
 
     const decryptButtonOnClick = async () => {
         setIsDecrypting(true);
@@ -40,7 +54,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                 console.error('Uploaded file is null');
                 return;
             }
-            const converted = await decryptor.decryptAsync(uploadedFile, chosenExtension);
+            const converted = await decryptor.decryptAsync(uploadedFile, chosenImageFormat);
             setConvertedText(converted);
             setShowModal(true);
         } catch (e) {
@@ -70,7 +84,21 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                     onClick={decryptButtonOnClick}
                     disabled={isDecrypting || uploadedFile === null}>
                 Decrypt
-            </Button>
+            </Button>,
+            <FormControl fullWidth={true} style={{
+                marginTop: 10
+            }}>
+                <InputLabel>Image format</InputLabel>
+                <Select color={'info'}
+                        variant={'outlined'}
+                        multiple={false}
+                        label={'Image format'}
+                        defaultValue={'png'}
+                        value={chosenImageFormat}
+                        onChange={e => setChosenImageFormat(e.target.value as ImageFormat)}>
+                    {imageFormatsMenuItems}
+                </Select>
+            </FormControl>
         ]}>
             <div style={{
                 display: 'flex',
@@ -176,8 +204,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                                 return 'converted.txt';
                             }
                             const name = uploadedFile.name;
-                            if (name.endsWith(chosenExtension)) {
-                                return `${name.substring(0, name.length - chosenExtension.length)}txt`;
+                            if (name.endsWith(chosenImageFormat)) {
+                                return `${name.substring(0, name.length - chosenImageFormat.length)}txt`;
                             }
                             return `${name}.txt`
                         }
