@@ -3,7 +3,7 @@ import {DecryptionProps} from "./DecryptionProps";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
 import {ImageFormat} from "../../domain/imageFormat";
 import './Decryption.tsx.css'
-import {Button, Dialog} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextareaAutosize} from "@mui/material";
 
 const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [isDecrypting, setIsDecrypting] = useState(false);
@@ -12,6 +12,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [showModal, setShowModal] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const textareaModalRef = useRef<HTMLTextAreaElement>(null);
 
     function isFileUploaded() {
         return uploadedFile !== null;
@@ -44,7 +45,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
             setShowModal(true);
         } catch (e) {
             console.error(e);
-            alert('Could not reconvert')
+            alert('Could not reconvert image')
         } finally {
             setIsDecrypting(false);
         }
@@ -130,8 +131,71 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         </Button>}
                 </div>
             </div>
-            <Dialog open={showModal}>
+            <Dialog open={showModal}
+                    fullWidth={true}
+                    maxWidth={'md'}>
+                <DialogTitle>
+                    <span>Deconverted text</span>
+                </DialogTitle>
 
+                <DialogContent style={{
+                    overflowX: 'clip'
+                }}>
+                    <TextareaAutosize className={'.text-converted'} style={{
+                        width: '100%',
+                        resize: 'vertical',
+                    }}
+                                      ref={textareaModalRef}
+                                      value={convertedText}/>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button color={'error'}
+                            onClick={() => {
+                        setUploadedFile(null);
+                        setShowModal(false);
+                    }}>
+                        Close
+                    </Button>
+                    <Button onClick={async () => {
+                        const textarea = textareaModalRef.current;
+                        if (!textarea) {
+                            return;
+                        }
+
+                        textarea.select();
+                        if (navigator.clipboard) {
+                            await navigator.clipboard.writeText(textarea.value);
+                        }
+                    }}>
+                        Copy
+                    </Button>
+                    <Button onClick={() => {
+                        function getFilename() {
+                            if (!uploadedFile) {
+                                return 'converted.txt';
+                            }
+                            const name = uploadedFile.name;
+                            if (name.endsWith(chosenExtension)) {
+                                return `${name.substring(0, name.length - chosenExtension.length)}txt`;
+                            }
+                            return `${name}.txt`
+                        }
+                        if (convertedText === undefined) {
+                            console.error('Could not save text as file. Converted text is undefined');
+                            return;
+                        }
+                        const a = document.createElement('a');
+                        a.download = getFilename();
+                        a.href = URL.createObjectURL(new Blob([convertedText], {type: 'text/plain'}));
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setShowModal(false);
+                    }}>
+                        Save
+                    </Button>
+                </DialogActions>
             </Dialog>
         </MainPageLayout>
     );
