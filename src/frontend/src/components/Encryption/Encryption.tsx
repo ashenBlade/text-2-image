@@ -119,16 +119,17 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         selectedMenuKeys={[chosenImageFormat]}>
             <div style={{
                 display: 'flex',
-                justifyContent: 'center',
                 flex: '1 1 auto',
+                justifyContent: 'center',
                 backgroundColor: 'white',
             }}>
-                <div onDrop={inputDivOnDrop} style={{
-                    height: '100%',
-                    display: 'flex',
-                    flex: '1 1 auto',
-                    justifyContent: 'center'
-                }}>
+                <div onDrop={inputDivOnDrop}
+                     style={{
+                         height: '100%',
+                         display: 'flex',
+                         flex: '1 1 auto',
+                         justifyContent: 'center'
+                     }}>
                     <input type={'file'}
                            multiple={false}
                            hidden={true}

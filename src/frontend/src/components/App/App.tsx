@@ -6,14 +6,16 @@ import AppProps from "./AppProps";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import {imageToTextPath, textToImagePath} from "./path";
 import {AppBar, Box, Button, Container, Toolbar} from "@mui/material";
+import Decryption from "../Decryption/Decryption";
 
 const App: FC<AppProps> = ({encryptor, decryptor}) => {
     const navigate = useNavigate();
     return (
         <div style={{
-            display: 'flex',
-            height: '100%',
-            flexFlow: 'column wrap'
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gridTemplateRows: 'min-content 1fr',
+            height: "100%"
         }}>
             <AppBar component={'nav'}
                     variant={'elevation'}
@@ -35,12 +37,8 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                 padding: '10px 0 10px 0',
             }}>
                 <Routes>
+                    <Route path={imageToTextPath} shouldRevalidate={() => false} element={<Decryption decryptor={decryptor}/>}/>
                     <Route path={textToImagePath} shouldRevalidate={() => false} element={<Encryption encryptor={encryptor}/>}/>
-                    <Route path={imageToTextPath} shouldRevalidate={() => false}
-                           element={
-                               <p style={{color: '#000'}}>
-                                   This is decryption page
-                               </p>}/>
                     <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                 </Routes>
             </Container>

@@ -1,199 +1,119 @@
-export {}
-// import React, {FC, useEffect, useMemo, useState} from 'react';
-// import {DecryptionProps} from "./DecryptionProps";
-// import MainPageLayout from "../MainPageLayout/MainPageLayout";
-// import {Button, Image, Modal} from "antd";
-// import {ImageExtension} from "../../domain/imageExtension";
-// import TextArea from "antd/es/input/TextArea";
-// import {ItemType} from "antd/es/menu/hooks/useItems";
-// import {UploadOutlined} from "@ant-design/icons";
-// import Dragger from "antd/es/upload/Dragger";
-// import './Decryption.tsx.css'
-//
-// const Decryption: FC<DecryptionProps> = ({decryptor}) => {
-//     const [isDecrypting, setIsDecrypting] = useState(false);
-//     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-//     const [convertedText, setConvertedText] = useState<string>();
-//     const [showModal, setShowModal] = useState(false);
-//     const [uploadedFileUrl, setUploadedFileUrl] = useState('');
-//
-//     useEffect(() => {
-//         let url: string;
-//         if (uploadedFile) {
-//             url = URL.createObjectURL(uploadedFile);
-//             setUploadedFileUrl(url);
-//         }
-//         return () => {
-//             if (url) {
-//                 URL.revokeObjectURL(url)
-//             }
-//         };
-//     }, [uploadedFile]);
-//
-//     function isFileUploaded() {
-//         return uploadedFile !== null;
-//     }
-//
-//     function updateChosenImageExtension(file: File) {
-//         const extension = file.name.split('.').pop();
-//         if (!extension) {
-//             console.warn('Could not detect file extension. Extension is empty');
-//             return;
-//         }
-//         console.log('fuck')
-//
-//         const extensionLower = extension.toLowerCase();
-//         if (Object.values(ImageExtension).some(ext => ext === extensionLower)) {
-//             setChosenExtension(extensionLower as ImageExtension)
-//         }
-//     }
-//
-//     const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
-//
-//     const imageExtensionsItemTypes = useMemo<ItemType[]>(
-//         () => Object.entries(ImageExtension)
-//             .map(entries => {
-//                 const extension = entries[0];
-//                 const key = entries[1];
-//                 return {
-//                     key: key,
-//                     label: extension,
-//                     onClick: () => {
-//                         setChosenExtension(key);
-//                     }
-//                 }
-//             }), []);
-//
-//     const selectedKeys = useMemo<string[]>(() => ([chosenExtension]), [chosenExtension])
-//     const menuItems = useMemo<ItemType[]>(() => [{
-//         label: 'Extension',
-//         children: imageExtensionsItemTypes,
-//         key: 'extension',
-//     }], [imageExtensionsItemTypes])
-//
-//
-//     const decryptButtonOnClick = async () => {
-//         setIsDecrypting(true);
-//         try {
-//             if (!uploadedFile) {
-//                 console.error('Uploaded file is null');
-//                 return;
-//             }
-//             const converted = await decryptor.decryptAsync(uploadedFile, chosenExtension);
-//             setConvertedText(converted);
-//             setShowModal(true);
-//         } catch (e) {
-//             console.error(e);
-//             Modal.error({
-//                 title: 'Could not convert image to text',
-//                 content: 'Error while sending request'
-//             })
-//         } finally {
-//             setIsDecrypting(false);
-//         }
-//     }
-//
-//     return (
-//         <MainPageLayout actionButtons={[
-//             <Button type={'primary'}
-//                     size={'large'}
-//                     block={true}
-//                     onClick={decryptButtonOnClick}
-//                     disabled={isDecrypting || uploadedFile === null}>
-//                 Decrypt
-//             </Button>
-//         ]}
-//                         selectedMenuKeys={selectedKeys}
-//                         menuItems={menuItems}>
-//             <Dragger multiple={false}
-//                      maxCount={0}
-//                      beforeUpload={f => {
-//                          setUploadedFile(f);
-//                          updateChosenImageExtension(f);
-//                          return false;
-//                      }}
-//                      style={{
-//                          padding: 10,
-//                          objectFit: 'scale-down'
-//                      }}
-//                      showUploadList={false}
-//                      onDrop={e => {
-//                          e.preventDefault();
-//                          const files = e.dataTransfer.files;
-//                          if (!files) {
-//                              return;
-//                          }
-//                          if (files.length > 1) {
-//                              return;
-//                          }
-//                          if (files[0]) {
-//                              updateChosenImageExtension(files[0])
-//                              setUploadedFile(files[0]);
-//                          }}}>
-//                 {!isFileUploaded()
-//                     ? <>
-//                         <p className={'ant-upload-drag-icon'}>
-//                             <UploadOutlined/>
-//                         </p>
-//                         <p className={'ant-upload-text'}>
-//                             Click or drag file here
-//                         </p>
-//                     </>
-//                     : <div style={{objectFit: 'scale-down'}}>
-//                         <Image src={uploadedFileUrl}
-//                                alt={'Uploaded file preview'}
-//                                className={'preview-image'}
-//                                onClick={e => e.stopPropagation()}/>
-//                         <p className={'ant-upload-text'}>
-//                             {uploadedFile!.name}
-//                         </p>
-//                         <div>
-//                             <Button danger={true}
-//                                     onClick={e => {
-//                                         e.stopPropagation();
-//                                         setUploadedFile(null)
-//                                     }}>
-//                                 Remove file
-//                             </Button>
-//                         </div>
-//                     </div>}
-//             </Dragger>
-//             <Modal open={showModal}
-//                    title={'Decrypted'}
-//
-//                    okText={'Save'}
-//                    onOk={() => {
-//                        const a = document.createElement('a');
-//                        a.href = uploadedFileUrl;
-//                        a.download = `${uploadedFile?.name ?? 'decrypted'}.txt`;
-//                        a.hidden = true;
-//                        document.body.appendChild(a);
-//                        a.click();
-//                        document.body.removeChild(a);
-//                        setShowModal(false);
-//                    }}
-//
-//                    afterClose={() => {
-//                        setUploadedFile(null);
-//                    }}
-//
-//                    cancelText={'Close'}
-//                    onCancel={() => {
-//                        setShowModal(false);
-//                    }}
-//                    maskClosable={false}>
-//                 {convertedText !== undefined &&
-//                     <TextArea readOnly={true}
-//                               className={'modal-height-adaptive'}
-//                               style={{
-//                                   resize: 'none',
-//                                   height: '50vh'
-//                               }}
-//                               value={convertedText}/>
-//                 }
-//             </Modal>
-//         </MainPageLayout>
-//     );
-// };
-//
-// export default Decryption;
+import React, {FC, useState} from 'react';
+import {DecryptionProps} from "./DecryptionProps";
+import MainPageLayout from "../MainPageLayout/MainPageLayout";
+import {ImageFormat} from "../../domain/imageFormat";
+import './Decryption.tsx.css'
+import {Button, Dialog} from "@mui/material";
+
+const Decryption: FC<DecryptionProps> = ({decryptor}) => {
+    const [isDecrypting, setIsDecrypting] = useState(false);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [convertedText, setConvertedText] = useState<string>();
+    const [showModal, setShowModal] = useState(false);
+
+    function isFileUploaded() {
+        return uploadedFile !== null;
+    }
+
+    function updateChosenImageExtension(file: File) {
+        const extension = file.name.split('.').pop();
+        if (!extension) {
+            console.warn('Could not detect file extension. Extension is empty');
+            return;
+        }
+
+        const extensionLower = extension.toLowerCase();
+        if (Object.values(ImageFormat).some(ext => ext === extensionLower)) {
+            setChosenExtension(extensionLower as ImageFormat)
+        }
+    }
+
+    const [chosenExtension, setChosenExtension] = useState(ImageFormat.PNG);
+
+    const decryptButtonOnClick = async () => {
+        setIsDecrypting(true);
+        try {
+            if (!uploadedFile) {
+                console.error('Uploaded file is null');
+                return;
+            }
+            const converted = await decryptor.decryptAsync(uploadedFile, chosenExtension);
+            setConvertedText(converted);
+            setShowModal(true);
+        } catch (e) {
+            console.error(e);
+            alert('Could not reconvert')
+        } finally {
+            setIsDecrypting(false);
+        }
+    }
+
+    return (
+        <MainPageLayout actionButtons={[
+            <Button variant={'contained'}
+                    color={'success'}
+                    onClick={decryptButtonOnClick}
+                    disabled={isDecrypting || uploadedFile === null}>
+                Decrypt
+            </Button>
+        ]}>
+            <div style={{
+                display: 'flex',
+                flex: '1 1 auto',
+                justifyContent: 'center',
+            }}
+                 onDragEnter={e => e.preventDefault()}
+                 onDragOver={e => e.preventDefault()}
+                 onDrop={e => {
+                     e.preventDefault();
+                     if (e.dataTransfer.files.length === 1) {
+                         const file = e.dataTransfer.files[0];
+                         setUploadedFile(file);
+                     }
+                 }}>
+                <div style={{
+                    border: 'gray dashed 1px',
+                    borderRadius: 5,
+
+                    display: 'flex',
+                    flex: '1 1 auto',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    {isFileUploaded()
+                        ? <div style={{
+                            display: 'flex',
+                            flexFlow: 'column wrap',
+                            alignItems: 'center',
+                            padding: 10
+                        }}>
+                            {uploadedFile &&
+                                // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                                <img src={URL.createObjectURL(uploadedFile)}
+                                     alt={'Converted image preview'}
+                                     style={{
+                                         objectFit: 'scale-down',
+                                         maxHeight: '100%',
+                                         maxWidth: '100%',
+                                     }}/>}
+                            <p>{uploadedFile?.name}</p>
+                            <Button variant={'outlined'} color={'error'} onClick={() => {
+                                setUploadedFile(null);
+                            }}>
+                                Remove
+                            </Button>
+
+                        </div>
+                        : <p>
+                            File not chosen
+                        </p>}
+                </div>
+            </div>
+            <Dialog open={showModal}>
+
+            </Dialog>
+        </MainPageLayout>
+    );
+};
+
+export default Decryption;
