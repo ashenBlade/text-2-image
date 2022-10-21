@@ -8,10 +8,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, FormControl,
-    InputLabel, MenuItem,
-    Select,
-    TextareaAutosize
+    DialogTitle, TextareaAutosize
 } from "@mui/material";
 
 const Decryption: FC<DecryptionProps> = ({decryptor}) => {
@@ -25,11 +22,6 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const textareaModalRef = useRef<HTMLTextAreaElement>(null);
 
     const imageFormats = useMemo(() => Object.values(ImageFormat), []);
-    const imageFormatsMenuItems = useMemo(() => Object.values(ImageFormat).map(imageFormat => (
-        <MenuItem value={imageFormat}>
-            {imageFormat}
-        </MenuItem>
-    )), []);
 
     function isFileUploaded() {
         return uploadedFile !== null;
@@ -78,28 +70,27 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     }
 
     return (
-        <MainPageLayout actionButtons={[
-            <Button variant={'contained'}
-                    color={'success'}
-                    onClick={decryptButtonOnClick}
-                    disabled={isDecrypting || uploadedFile === null}>
-                Decrypt
-            </Button>,
-            <FormControl fullWidth={true} style={{
-                marginTop: 10
-            }}>
-                <InputLabel>Image format</InputLabel>
-                <Select color={'info'}
-                        variant={'outlined'}
-                        multiple={false}
-                        label={'Image format'}
-                        defaultValue={'png'}
-                        value={chosenImageFormat}
-                        onChange={e => setChosenImageFormat(e.target.value as ImageFormat)}>
-                    {imageFormatsMenuItems}
-                </Select>
-            </FormControl>
-        ]}>
+        <MainPageLayout
+            buttons={[
+                {
+                    name: 'Deconvert',
+                    onClick: decryptButtonOnClick,
+                    color: 'success',
+                    variant: 'contained',
+                    disabled: isDecrypting || !isFileUploaded()
+                }
+            ]}
+            menuElements={[
+                {
+                    name: 'Image format',
+                    onSelect: v => setChosenImageFormat(v as ImageFormat),
+                    defaultValue: ImageFormat.PNG,
+                    items: imageFormats.map(f => ({
+                        name: f,
+                        value: f
+                    }))
+                }
+            ]}>
             <div style={{
                 display: 'flex',
                 flex: '1 1 auto',

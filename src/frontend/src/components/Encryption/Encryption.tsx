@@ -6,10 +6,7 @@ import MainPageLayout from "../MainPageLayout/MainPageLayout";
 import {
     Dialog, DialogActions,
     DialogContent, TextField,
-    InputLabel,
     Button, DialogTitle,
-    FormControl, MenuItem,
-    Select,
 } from "@mui/material";
 import {Upload} from "@mui/icons-material";
 
@@ -24,11 +21,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
 
     const inputFileRef = useRef<HTMLInputElement>(null);
 
-    const imageFormatsMenuItems = useMemo(() => Object.values(ImageFormat).map(imageFormat => (
-        <MenuItem value={imageFormat}>
-            {imageFormat}
-        </MenuItem>
-    )), []);
+    const imageFormats = useMemo(() => Object.values(ImageFormat), []);
 
     const updateImageUrl = (blob: Blob) => {
         URL.revokeObjectURL(createdImageUrl);
@@ -84,39 +77,36 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     }
 
     return (
-        <MainPageLayout actionButtons={[
-            <Button onClick={encryptButtonOnClick}
-                    variant={'contained'}
-                    color={'success'}
-                    style={{
-                        marginBottom: 5
-                    }}
-                    disabled={imageLoading || (isTextInput() && !inputText)}>
-                Convert
-            </Button>,
-            <Button onClick={uploadFileOnClick}
-                    variant={'outlined'}
-                    color={'info'}
-                    style={{
-                        marginBottom: 10
-                    }}
-                    disabled={imageLoading || !isTextInput()}>
-                Upload file
-            </Button>,
-            <FormControl fullWidth={true}>
-                <InputLabel>Image format</InputLabel>
-                <Select color={'info'}
-                        variant={'outlined'}
-                        multiple={false}
-                        label={'Image format'}
-                        defaultValue={'png'}
-                        value={chosenImageFormat}
-                        onChange={e => setChosenImageFormat(e.target.value as ImageFormat)}>
-                    {imageFormatsMenuItems}
-                </Select>
-            </FormControl>
-        ]}
-        selectedMenuKeys={[chosenImageFormat]}>
+        <MainPageLayout
+            buttons={[
+                {
+                    name: 'Convert',
+                    color: 'success',
+                    variant: 'contained',
+                    onClick: encryptButtonOnClick,
+                    disabled: imageLoading || (isTextInput() && !inputText)
+                },
+                {
+                    name: 'Upload file',
+                    variant: 'outlined',
+                    color: 'success',
+                    onClick: uploadFileOnClick,
+                    disabled: imageLoading || !isTextInput()
+                }
+            ]}
+            menuElements={[
+                {
+                    name: 'Image format',
+                    onSelect(value: string) {
+                        setChosenImageFormat(value as ImageFormat)
+                    },
+                    defaultValue: ImageFormat.PNG,
+                    items: imageFormats.map(f => ({
+                        name: f,
+                        value: f
+                    }))
+                }
+            ]}>
             <div style={{
                 display: 'flex',
                 flex: '1 1 auto',
