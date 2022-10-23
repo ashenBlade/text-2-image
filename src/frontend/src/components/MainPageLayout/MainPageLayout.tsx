@@ -1,44 +1,59 @@
 import React, {FC} from 'react';
-import {Layout, Menu, Space} from "antd";
-import Sider from "antd/es/layout/Sider";
 import {MainPageLayoutProps} from "./MainPageLayoutProps";
-import {Content} from "antd/es/layout/layout";
+import {Box, Button, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
+import './MainPageLayout.css'
 
 const MainPageLayout: FC<MainPageLayoutProps> = (
-    {
-        actionButtons,
-        selectedMenuKeys,
-        menuItems,
+    {buttons,
+        menuElements,
         children}) => {
     return (
-        <Layout>
-            <Sider style={{
-                backgroundColor: 'white',
-                width: 200
-            }}>
-                <Space direction={'vertical'}
-                       style={{
-                           display: 'flex',
-                           justifyContent: 'center',
-                           width: '100%',
-                           padding: 10
-                       }}>
-                    {actionButtons}
-                </Space>
-                <Menu mode={'inline'}
-                      selectedKeys={selectedMenuKeys}
-                      items={menuItems}/>
-            </Sider>
-            <Content style={{
-                marginLeft: 10,
-                display: 'block',
-                justifyContent: 'center',
-                height: '100%',
-                backgroundColor: 'white'
-            }}>
+        <Box className={'main-content'}>
+            <Box className={'main-content_actions'}>
+                <Box className={'main-content_actions__buttons'}>
+                    {
+                        buttons?.map(b => (
+                            <Button
+                                onClick={b.onClick}
+                                disabled={b.disabled}
+                                key={b.name}
+                                value={b.name}
+                                fullWidth={true}
+                                variant={b.variant}
+                                color={b.color}>
+                                {b.name}
+                            </Button>
+                        ))
+                    }
+                </Box>
+                <Box style={{marginTop: 10}}
+                     className={'main-content_actions__settings'}>
+                    {
+                        menuElements?.map(element => (
+                            <FormControl key={element.name}
+                                         fullWidth={true}>
+                                <InputLabel>{element.name}</InputLabel>
+                                <Select color={'info'}
+                                        variant={'outlined'}
+                                        multiple={false}
+                                        label={element.name}
+                                        defaultValue={element.defaultValue}
+                                        onChange={e => element.onSelect(e.target.value)}>
+                                {
+                                    element.items.map(e => (
+                                        <MenuItem value={e.value} key={e.value}>
+                                            {e.name}
+                                        </MenuItem>))
+                                }
+                            </Select>
+                        </FormControl>))
+                    }
+                </Box>
+            </Box>
+            <Box className={'main-content_input'}>
                 {children}
-            </Content>
-        </Layout>
+            </Box>
+        </Box>
     );
 };
 

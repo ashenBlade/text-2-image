@@ -1,60 +1,36 @@
 import React, {FC, useMemo, useRef, useState} from 'react';
-import {Button, Image, Input, Modal} from "antd";
-import TextArea from "antd/es/input/TextArea";
 import '../../common.css';
-import {FileTextOutlined} from "@ant-design/icons";
 import EncryptionProps from "./EncryptionProps";
-import {ImageExtension} from "../../domain/imageExtension";
-import {ItemType} from "antd/es/menu/hooks/useItems";
+import {ImageFormat} from "../../domain/imageFormat";
 import MainPageLayout from "../MainPageLayout/MainPageLayout";
+import {
+    Dialog, DialogActions,
+    DialogContent, TextField,
+    Button, DialogTitle,
+} from "@mui/material";
+import {Upload} from "@mui/icons-material";
 
 const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [inputText, setInputText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageLoading, setImageLoading] = useState(false);
-    const [chosenExtension, setChosenExtension] = useState(ImageExtension.PNG);
+    const [chosenImageFormat, setChosenImageFormat] = useState(ImageFormat.PNG);
     const [imageFilename, setImageFilename] = useState('');
-    const [imageUrl, setImageUrl] = useState('')
+    const [createdImageUrl, setCreatedImageUrl] = useState('')
     const [showImageModal, setShowImageModal] = useState(false);
+
     const inputFileRef = useRef<HTMLInputElement>(null);
 
-    const updateImageUrl = (blob: Blob) => {
-        URL.revokeObjectURL(imageUrl);
-        setImageUrl(URL.createObjectURL(blob));
-    }
+    const imageFormats = useMemo(() => Object.values(ImageFormat), []);
 
-    const imageExtensionsItemTypes = useMemo<ItemType[]>(
-        () => Object.entries(ImageExtension)
-            .map(entries => {
-                const extension = entries[0];
-                const key = entries[1];
-                return {
-                    key: key,
-                    label: extension,
-                    onClick: () => {
-                        setChosenExtension(key);
-                    }
-                }
-            }), []);
-    const defaultSelectedKeys = useMemo<string[]>(() => ([ImageExtension.PNG]), [])
-    const menuItems = useMemo<ItemType[]>(() => [{
-        label: 'Extension',
-        children: imageExtensionsItemTypes,
-        key: 'extension',
-    }], [imageExtensionsItemTypes])
+    const updateImageUrl = (blob: Blob) => {
+        URL.revokeObjectURL(createdImageUrl);
+        setCreatedImageUrl(URL.createObjectURL(blob));
+    }
 
     function isTextInput() {
         return selectedFile === null;
     }
-
-    function tearDownFiles() {
-        setImageUrl('');
-        setSelectedFile(null);
-        if (inputFileRef.current) {
-            inputFileRef.current.value = '';
-        }
-    }
-
     function uploadFileOnClick(e: React.MouseEvent<HTMLButtonElement>) {
         e.preventDefault();
         inputFileRef.current?.click();
@@ -88,8 +64,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
         setImageLoading(true);
         try {
             try {
-                updateImageUrl(await encryptor.encryptAsync(data, chosenExtension))
-                setImageFilename(`${selectedFile?.name || 'encrypted'}`)
+                updateImageUrl(await encryptor.encryptAsync(data, chosenImageFormat))
+                setImageFilename(`${selectedFile?.name || 'converted'}.${chosenImageFormat}`)
                 setShowImageModal(true);
             } catch (e) {
                 console.error('Could not encrypt image', e);
@@ -101,40 +77,49 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     }
 
     return (
-        <MainPageLayout actionButtons={[
-            <Button type={'primary'}
-                    size={'large'}
-                    block={true}
-                    onClick={encryptButtonOnClick}
-                    disabled={imageLoading || (isTextInput() && !inputText)}
-                    loading={imageLoading}>
-                Convert
-            </Button>,
-            <Button type={'primary'}
-                    size={'large'}
-                    block={true}
-                    style={{
-                        backgroundColor: imageLoading || !isTextInput() ? '#f5f5f5' : 'green',
-                        borderColor: imageLoading || !isTextInput() ? '#d9d9d9' : 'green',
-                    }}
-                    onClick={uploadFileOnClick}
-                    disabled={imageLoading || !isTextInput()}>
-                Upload file
-            </Button>
-        ]}
-        menuItems={menuItems}
-        selectedMenuKeys={defaultSelectedKeys}>
+        <MainPageLayout
+            buttons={[
+                {
+                    name: 'Convert',
+                    color: 'success',
+                    variant: 'contained',
+                    onClick: encryptButtonOnClick,
+                    disabled: imageLoading || (isTextInput() && !inputText)
+                },
+                {
+                    name: 'Upload file',
+                    variant: 'outlined',
+                    color: 'info',
+                    onClick: uploadFileOnClick,
+                    disabled: imageLoading || !isTextInput()
+                }
+            ]}
+            menuElements={[
+                {
+                    name: 'Image format',
+                    onSelect(value: string) {
+                        setChosenImageFormat(value as ImageFormat)
+                    },
+                    defaultValue: ImageFormat.PNG,
+                    items: imageFormats.map(f => ({
+                        name: f,
+                        value: f
+                    }))
+                }
+            ]}>
             <div style={{
-                display: 'block',
+                display: 'flex',
+                flex: '1 1 auto',
                 justifyContent: 'center',
-                height: '100%',
-                backgroundColor: 'white'
+                backgroundColor: 'white',
             }}>
-                <div onDrop={inputDivOnDrop} style={{
-                    height: '100%',
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
+                <div onDrop={inputDivOnDrop}
+                     style={{
+                         height: '100%',
+                         display: 'flex',
+                         flex: '1 1 auto',
+                         justifyContent: 'center'
+                     }}>
                     <input type={'file'}
                            multiple={false}
                            hidden={true}
@@ -149,71 +134,88 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                                }
                            }}/>
                     {isTextInput() ?
-                        <TextArea placeholder={'Enter text or drag a file...'}
-                                  size={'large'}
+                        <textarea placeholder={'Enter text or drag a file...'}
                                   autoFocus={true}
                                   style={{
                                       resize: 'none',
-                                      height: '100%',
+                                      height: 'auto',
                                       width: '100%',
+                                      borderColor: 'gray',
+                                      borderRadius: '3px',
+                                      padding: 5
                                   }}
                                   value={inputText}
                                   onChange={e => setInputText(e.currentTarget.value)}/>
-                        : <div className={'ant-upload-drag ant-upload'}>
-                            <span className={'ant-upload-btn ant-upload'}>
-                                <div className={'ant-upload-drag-container'}>
-                                    <p className={'ant-upload-drag-icon'}>
-                                        <FileTextOutlined/>
-                                    </p>
-                                    <p className={'ant-upload-text'}>
-                                        {selectedFile?.name}
-                                    </p>
-                                    <Button danger={true}
-                                            size={'large'}
-                                            onClick={removeButtonOnClick}>
-                                        Remove
-                                    </Button>
-                                </div>
-                            </span>
+                        : <div style={{
+                            textAlign: 'center',
+                            border: 'gray dashed 1px',
+                            borderRadius: 3,
+                            display: 'flex',
+                            flex: '1 1 auto',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flexFlow: 'column wrap'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <Upload color={'info'}
+                                        fontSize={'large'}
+                                        fillRule={'nonzero'}
+                                        width={100}/>
+                                <span>
+                                    {selectedFile?.name}
+                                </span>
+                            </div>
+                            <Button color={'error'}
+                                    onClick={removeButtonOnClick}
+                                    variant={'outlined'}>
+                                Remove
+                            </Button>
                         </div>}
                 </div>
             </div>
-            <Modal title={'Converted text'}
-                   open={showImageModal}
-                   okText={'Save'}
-                   onOk={e => {
-                       const a = document.createElement('a')
-                       a.href = imageUrl;
-                       a.download = `${imageFilename || 'converted'}.${chosenExtension}`;
-                       a.hidden = true;
-                       document.body.appendChild(a);
-                       a.click();
-                       document.body.removeChild(a);
-                       e.preventDefault();
-                       setShowImageModal(false);
-                   }}
-                   cancelText={'Cancel'}
-                   onCancel={() => {
-                       setShowImageModal(false);
-                   }}
-                   afterClose={() => {
-                       tearDownFiles();
-                       setImageFilename('');
-                   }}
-                   maskClosable={false}
-                   closable={false}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
-                    <Image src={imageUrl}
-                           alt={'Converted image preview'}/>
-                </div>
-                <Input type={'text'}
-                       value={imageFilename}
-                       placeholder={'Enter image filename'}
-                       onChange={e => setImageFilename(e.currentTarget.value)}/>
-            </Modal>
+            <Dialog open={showImageModal}
+                    fullWidth={true}>
+
+                    <DialogTitle>
+                        Converted text
+                    </DialogTitle>
+
+                    <DialogContent>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}>
+                            {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
+                            <img src={createdImageUrl} alt={'Converted image preview'}/>
+                        </div>
+                        <TextField type={'text'}
+                                   fullWidth={true}
+                                   variant={'standard'}
+                                   value={imageFilename}
+                                   placeholder={'converted.png'}
+                                   onChange={e => setImageFilename(e.currentTarget.value)}
+                                   label={'Filename'}
+                                   style={{marginTop: 20}}/>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button color={'error'} onClick={() => setShowImageModal(false)}>Close</Button>
+                        <Button onClick={() => {
+                            const a = document.createElement('a')
+                            a.href = createdImageUrl;
+                            a.download = imageFilename;
+                            a.type = 'download';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setShowImageModal(false);
+                        }}>Save</Button>
+                    </DialogActions>
+
+            </Dialog>
         </MainPageLayout>
     );
 };

@@ -2,62 +2,73 @@ import logging
 from http import HTTPStatus
 from io import BytesIO
 
-from fastapi import APIRouter, Form, HTTPException, Depends
+from PIL import Image
+from fastapi import APIRouter, Form, HTTPException
 from starlette.responses import StreamingResponse, Response
 
-from text_to_image import TextImage, TextImageSaver
-from web.dependencies import get_text_image_saver
+from text_to_image import TextImage, ImageMode, ImageFormat
+from web.routers.default_image_mode import DEFAULT_IMAGE_MODE
+from web.routers.default_image_format import DEFAULT_IMAGE_FORMAT
 
-router = APIRouter()
+text_to_image_router = APIRouter()
 
-text_to_image_logger = logging.getLogger(__name__)
-
-SUPPORTED_IMAGE_EXTENSIONS = {"png"}
-
-
-def is_image_extension_supported(image_extension: str) -> bool:
-    return image_extension.lower() in SUPPORTED_IMAGE_EXTENSIONS
+logger = logging.getLogger(__name__)
 
 
-def write_image_to_bytes_io(text: str, image_saver: TextImageSaver) -> BytesIO:
+def to_image(text: str, image_mode: ImageMode) -> Image.Image:
     try:
-        image = TextImage.from_text(text)
-        buffer = BytesIO()
-        image_saver.save(buffer, image)
-        buffer.seek(0)
-        return buffer
-    except ValueError as value:
-        text_to_image_logger.info(
-            'Could not convert text to image: "%s"', text, exc_info=value
-        )
+        text_image = TextImage.from_text(text)
+    except UnicodeEncodeError as unicode_encode_error:
+        logger.warning('Could not create TextImage from text',
+                       exc_info=unicode_encode_error)
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="Could not convert given text. Internal error. Sorry",
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail='Error during encoding provided text'
         )
 
+    pil_image = Image.new(mode=image_mode,
+                          size=text_image.size)
+    pil_image.putdata(list(text_image.pixels))
+    return pil_image
 
-@router.post("/api/text/to/image", response_class=StreamingResponse)
-async def post__text_to_image(
-    text: str = Form(),
-    image_extension: str = Form("png"),
-    image_saver: TextImageSaver = Depends(get_text_image_saver),
-) -> Response:
-    if not len(text):
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Input text must not be empty"
-        )
 
-    if not is_image_extension_supported(image_extension):
+def get_image_file_bytes(image: Image.Image, image_format: ImageFormat) -> BytesIO:
+    buffer = BytesIO()
+    try:
+        image.save(buffer,
+                   format=image_format.name,
+                   **image_format.save_options)
+    except KeyError as key_error:
+        logger.warning('Requested saving image with not supported image extension',
+                       exc_info=key_error)
         raise HTTPException(
             status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
-            detail=f"Image extension '{image_extension}' is not supported",
+            detail='Requested image format is not supported'
+        )
+    buffer.seek(0)
+    return buffer
+
+
+def get_image_format(image_extension: str) -> ImageFormat:
+    try:
+        return ImageFormat.parse(image_extension)
+    except ValueError as value_error:
+        logger.warning('Could not get ImageFormat from ImageExtension: %s', image_extension, exc_info=value_error)
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Provided image format is not supported'
         )
 
-    text_to_image_logger.info("Convert of string with length: %i", len(text))
-    response = write_image_to_bytes_io(text, image_saver)
+
+@text_to_image_router.post("/api/text/to/image", response_class=StreamingResponse)
+async def post__text_to_image(
+        text: str = Form(),
+        image_extension: str = Form(default=DEFAULT_IMAGE_FORMAT.name)) -> Response:
+    image_format = get_image_format(image_extension)
+    image = to_image(text, DEFAULT_IMAGE_MODE)
+    file_content = get_image_file_bytes(image, image_format)
     return StreamingResponse(
-        response,
-        media_type=f"image/{image_extension}",
+        content=file_content,
+        media_type=f"image/{image_format.name}",
         status_code=200
     )

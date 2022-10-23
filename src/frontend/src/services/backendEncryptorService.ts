@@ -1,13 +1,13 @@
 import EncryptService from "../domain/encryptService";
-import {ImageExtension} from "../domain/imageExtension";
+import {ImageFormat} from "../domain/imageFormat";
 
 export default class BackendEncryptorService implements EncryptService {
     constructor(readonly serverUrl: string) {  }
 
-    async encryptAsync(data: string, extension: ImageExtension): Promise<Blob> {
+    async encryptAsync(data: string, extension: ImageFormat): Promise<Blob> {
         const formData = new FormData();
         formData.set('text', data);
-        formData.set('extension', extension);
+        formData.set('image_extension', extension);
         const result = await fetch(`${this.serverUrl}/api/text/to/image`, {
             method: 'POST',
             body: formData

@@ -1,5 +1,5 @@
-import {ImageExtension} from "./imageExtension";
+import {ImageFormat} from "./imageFormat";
 
 export default interface EncryptService {
-    encryptAsync(data: string, extension: ImageExtension): Promise<Blob>
+    encryptAsync(data: string, extension: ImageFormat): Promise<Blob>
 }

@@ -1,9 +1,9 @@
 import DecryptService from "../domain/decryptService";
-import {ImageExtension} from "../domain/imageExtension";
+import {ImageFormat} from "../domain/imageFormat";
 
 export default class BackendDecryptService implements DecryptService {
     constructor(readonly serverUrl: string) {  }
-    async decryptAsync(blob: Blob, extension: ImageExtension): Promise<string> {
+    async decryptAsync(blob: Blob, extension: ImageFormat): Promise<string> {
         const form = new FormData();
         form.append('file', blob);
         form.append('extension', extension);
