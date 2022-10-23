@@ -3,12 +3,17 @@ version: '3.7'
 services:
   frontend:
     build:
+      args:
+        - server_url=http://localhost:8081
       context: src/frontend
       dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+
 
   backend:
     build:
       context: .
       dockerfile: src/backend/Dockerfile
     ports:
-      - '8080:80'
+      - '8081:80'
