@@ -16,10 +16,10 @@ const MainPageLayout: FC<MainPageLayoutProps> = (
             padding: '0 5px 0 5px'
         }}>
             <Box style={{
-            display: 'flex',
-            flexFlow: 'column wrap',
-            width: 200,
-        }}>
+                display: 'flex',
+                flexFlow: 'column wrap',
+                width: 200,
+            }}>
                 {
                     buttons?.map(b => (
                         <Button
@@ -30,25 +30,25 @@ const MainPageLayout: FC<MainPageLayoutProps> = (
                             fullWidth={true}
                             variant={b.variant}
                             color={b.color}
-                        style={{
-                            marginBottom: 10
-                        }}>
+                            style={{
+                                marginBottom: 10
+                            }}>
                             {b.name}
                         </Button>
                     ))
                 }
-            <Box>
-                {
-                    menuElements?.map(element => (
-                        <FormControl key={element.name}
-                                     fullWidth={true}>
-                            <InputLabel>{element.name}</InputLabel>
-                            <Select color={'info'}
-                                    variant={'outlined'}
-                                    multiple={false}
-                                    label={element.name}
-                                    defaultValue={element.defaultValue}
-                                    onChange={e => element.onSelect(e.target.value)}>
+                <Box>
+                    {
+                        menuElements?.map(element => (
+                            <FormControl key={element.name}
+                                         fullWidth={true}>
+                                <InputLabel>{element.name}</InputLabel>
+                                <Select color={'info'}
+                                        variant={'outlined'}
+                                        multiple={false}
+                                        label={element.name}
+                                        defaultValue={element.defaultValue}
+                                        onChange={e => element.onSelect(e.target.value)}>
                                 {
                                     element.items.map(e => (
                                         <MenuItem value={e.value} key={e.value}>
