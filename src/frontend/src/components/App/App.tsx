@@ -15,26 +15,22 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    Toolbar, Typography
+    Toolbar, Typography,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
 import Decryption from "../Decryption/Decryption";
+import {ChevronLeft} from "@mui/icons-material";
+import './App.css'
 
 const App: FC<AppProps> = ({encryptor, decryptor}) => {
     const navigate = useNavigate();
     const [openDrawer, setOpenDrawer] = useState(false);
 
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gridTemplateRows: 'min-content 1fr',
-            height: "100%"
-        }}>
+        <div className={'app'}>
             <AppBar component={'nav'}
                     variant={'elevation'}
                     position={'sticky'}>
-
                 <Toolbar>
                     <IconButton color={'inherit'}
                                 aria-label={'open drawer'}
@@ -69,7 +65,17 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                                 }
                             }}
                             onClose={() => setOpenDrawer(false)}>
-                        <Toolbar/>
+                        <Toolbar style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end'
+                        }}>
+                            <div>
+                                <IconButton onClick={() => setOpenDrawer(false)}>
+                                    <ChevronLeft/>
+                                </IconButton>
+                            </div>
+                        </Toolbar>
                         <List>
                             <Divider/>
                             <ListItem disablePadding>

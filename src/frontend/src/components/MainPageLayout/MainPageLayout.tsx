@@ -20,11 +20,7 @@ const MainPageLayout: FC<MainPageLayoutProps> = (
                                 value={b.name}
                                 fullWidth={true}
                                 variant={b.variant}
-                                color={b.color}
-                                // style={{
-                                //     marginBottom: 10
-                                // }}
-                            >
+                                color={b.color}>
                                 {b.name}
                             </Button>
                         ))
