@@ -1,43 +1,37 @@
 import React, {FC} from 'react';
 import {MainPageLayoutProps} from "./MainPageLayoutProps";
 import {Box, Button, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
+import './MainPageLayout.css'
 
 const MainPageLayout: FC<MainPageLayoutProps> = (
     {buttons,
         menuElements,
         children}) => {
     return (
-        <Box style={{
-            display: 'grid',
-            gridTemplateColumns: '200px 1fr',
-            gridTemplateRows: '1fr',
-            width: '100%',
-            height: '100%',
-            padding: '0 5px 0 5px'
-        }}>
-            <Box style={{
-                display: 'flex',
-                flexFlow: 'column wrap',
-                width: 200,
-            }}>
-                {
-                    buttons?.map(b => (
-                        <Button
-                            onClick={b.onClick}
-                            disabled={b.disabled}
-                            key={b.name}
-                            value={b.name}
-                            fullWidth={true}
-                            variant={b.variant}
-                            color={b.color}
-                            style={{
-                                marginBottom: 10
-                            }}>
-                            {b.name}
-                        </Button>
-                    ))
-                }
-                <Box>
+        <Box className={'main-content'}>
+            <Box className={'main-content_actions'}>
+                <Box className={'main-content_actions__buttons'}>
+                    {
+                        buttons?.map(b => (
+                            <Button
+                                onClick={b.onClick}
+                                disabled={b.disabled}
+                                key={b.name}
+                                value={b.name}
+                                fullWidth={true}
+                                variant={b.variant}
+                                color={b.color}
+                                // style={{
+                                //     marginBottom: 10
+                                // }}
+                            >
+                                {b.name}
+                            </Button>
+                        ))
+                    }
+                </Box>
+                <Box style={{marginTop: 10}}
+                     className={'main-content_actions__settings'}>
                     {
                         menuElements?.map(element => (
                             <FormControl key={element.name}
@@ -57,17 +51,10 @@ const MainPageLayout: FC<MainPageLayoutProps> = (
                                 }
                             </Select>
                         </FormControl>))
-                }
+                    }
+                </Box>
             </Box>
-        </Box>
-            <Box style={{
-                marginLeft: 10,
-                display: 'flex',
-                justifyContent: 'center',
-                height: '100%',
-                backgroundColor: 'white',
-                flex: '1 1 auto',
-            }}>
+            <Box className={'main-content_input'}>
                 {children}
             </Box>
         </Box>
