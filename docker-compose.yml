@@ -17,3 +17,5 @@ services:
       dockerfile: src/backend/Dockerfile
     ports:
       - '8081:80'
+    environment:
+      - ORIGINS=http://localhost:8080
