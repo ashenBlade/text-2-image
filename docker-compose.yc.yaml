@@ -2,22 +2,14 @@ version: '3.7'
 
 services:
   nginx:
-    build:
-      context: nginx
-      dockerfile: Dockerfile
+    image: {{ env.NGINX_IMAGE }}
     ports:
       - '80:80'
 
   frontend:
-    build:
-      context: src/frontend
-      dockerfile: Dockerfile
-      args:
-        - server_url=http://localhost:8080
+    image: {{ env.FRONTEND_IMAGE }}
 
   backend:
-    build:
-      context: src/backend
-      dockerfile: Dockerfile
+    image: {{ env.BACKEND_IMAGE }}
     environment:
-      - ORIGINS=http://localhost:8080
+      - ORIGINS={{ env.FRONTEND_ORIGINS }}

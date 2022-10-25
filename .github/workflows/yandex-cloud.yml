@@ -4,6 +4,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  FRONTEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:latest
+  BACKEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:latest
+  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:latest
+
 jobs:
 
   build-docker:
@@ -28,7 +33,7 @@ jobs:
         context: src/backend
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:latest
+        tags: $BACKEND_IMAGE
     
     - name: Build Frontend
       uses: docker/build-push-action@v3
@@ -38,12 +43,22 @@ jobs:
         push: true
         build-args: |
           server_url: ${{ secrets.API_SERVER_URL }}
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:latest
-  
+        tags: $FRONTEND_IMAGE
+
+    - name: Compose together with Nginx
+      uses: docker/build-push-action@v3
+      with:
+        context: nginx
+        file: ./Dockerfile
+        push: true
+        tags: $NGINX_IMAGE
+
+
   update-yc:
     runs-on: ubuntu-latest
     needs: [build-docker]
     steps:
+
     - name: Login to Yandex Cloud
       id: logic-cr
       uses: yc-actions/yc-cr-login@v1
@@ -54,6 +69,11 @@ jobs:
     - name: Deploy COI VM
       id: deploy-coi
       uses: yc-actions/yc-coi-deploy@v1
+      env:
+        BACKEND_IMAGE: $BACKEND_IMAGE
+        FRONTEND_IMAGE: $FRONTEND_IMAGE
+        NGINX_IMAGE: $NGINX_IMAGE
+        ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
         folder-id: some-name********
