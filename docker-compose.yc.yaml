@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80'
+
+  frontend:
+    build:
+      context: src/frontend
+      dockerfile: Dockerfile
+      args:
+        - server_url=http://localhost:8080
+
+  backend:
+    build:
+      context: src/backend
+      dockerfile: Dockerfile
+    environment:
+      - ORIGINS=http://localhost:8080
