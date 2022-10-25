@@ -37,6 +37,12 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
         }
     }, [uploadedFile, imageFormats]);
 
+    function clearInputFile() {
+        setUploadedFile(null);
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
+    }
 
 
     const decryptButtonOnClick = async () => {
@@ -103,6 +109,9 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                      if (e.dataTransfer.files.length === 1) {
                          const file = e.dataTransfer.files[0];
                          setUploadedFile(file);
+                         if (inputRef.current) {
+                             inputRef.current.files = e.dataTransfer.files;
+                         }
                      }
                  }}>
                 <input type={'file'}
@@ -113,7 +122,6 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                 <div style={{
                     border: 'gray dashed 1px',
                     borderRadius: 5,
-
                     display: 'flex',
                     flex: '1 1 auto',
                     justifyContent: 'center',
@@ -137,7 +145,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                                      }}/>}
                             <p>{uploadedFile?.name}</p>
                             <Button variant={'outlined'} color={'error'} onClick={() => {
-                                setUploadedFile(null);
+                                clearInputFile();
                             }}>
                                 Remove
                             </Button>
@@ -171,9 +179,9 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                 <DialogActions>
                     <Button color={'error'}
                             onClick={() => {
-                        setUploadedFile(null);
-                        setShowModal(false);
-                    }}>
+                                clearInputFile();
+                                setShowModal(false);
+                            }}>
                         Close
                     </Button>
                     <Button onClick={async () => {
@@ -211,6 +219,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         a.click();
                         document.body.removeChild(a);
                         setShowModal(false);
+                        clearInputFile()
                     }}>
                         Save
                     </Button>
