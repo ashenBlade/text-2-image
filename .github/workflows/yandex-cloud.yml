@@ -1,0 +1,67 @@
+name: Docker Image CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Login to Dockerhub
+      uses: docker/login/action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build Backend
+      uses: docker/build-push-action@v3
+      with:
+        context: src/backend
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:latest
+    
+    - name: Build Frontend
+      uses: docker/build-push-action@v3
+      with:
+        context: src/backend
+        file: ./Dockerfile
+        push: true
+        build-args: |
+          server_url: ${{ secrets.API_SERVER_URL }}
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:latest
+  
+  update-yc:
+    runs-on: ubuntu-latest
+    needs: [build-docker]
+    steps:
+    - name: Login to Yandex Cloud
+      id: logic-cr
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+        
+    
+    - name: Deploy COI VM
+      id: deploy-coi
+      uses: yc-actions/yc-coi-deploy@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+        folder-id: some-name********
+        VM-name: yc-action-demo
+        vm-service-account-id: some-account-id*******
+        vm-cores: 1
+        vm-memory: 512Mb
+        vm-core-fraction: 100
+        vm-subnet-id: some-subnet-id*********
+        user-data-path: what******
+        docker-compose-path: './docker-compose.yc.yml'
