@@ -9,5 +9,5 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: src/backend/Dockerfile
+      context: src/backend
+      dockerfile: Dockerfile
