@@ -88,19 +88,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend, build-nginx]
     steps:
-
-    - name: Login to Yandex Cloud
-      id: logic-cr
-      uses: yc-actions/yc-cr-login@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-    
     - name: Checkout
       uses: actions/checkout@v3
 
     - name: Deploy COI VM
       id: deploy-coi
-      uses: yc-actions/yc-coi-deploy@v1
+      uses: yc-actions/yc-coi-deploy@v1.0.1
       env:
         BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
         FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
