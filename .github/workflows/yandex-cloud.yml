@@ -96,6 +96,7 @@ jobs:
         pwd
         ls
         ls ..
+        ls yandex-cloud
 
     - name: Deploy COI VM
       id: deploy-coi
