@@ -102,9 +102,9 @@ jobs:
       id: deploy-coi
       uses: yc-actions/yc-coi-deploy@v1
       env:
-        BACKEND_IMAGE: $BACKEND_IMAGE
-        FRONTEND_IMAGE: $FRONTEND_IMAGE
-        NGINX_IMAGE: $NGINX_IMAGE
+        BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
+        FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
+        NGINX_IMAGE: ${{ env.NGINX_IMAGE }}
         FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
         YC_VM_SSH: ${{ secrets.YC_VM_SSH }}
       with:
@@ -116,5 +116,5 @@ jobs:
         vm-memory: 1Gb
         vm-core-fraction: 20
         vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
-        docker-compose-path: './yandex-cloud/docker-compose.yc.yml'
-        user-data-path: './yandex-cloud/user-data.yml'
+        docker-compose-path: 'yandex-cloud/docker-compose.yc.yml'
+        user-data-path: 'yandex-cloud/user-data.yml'
