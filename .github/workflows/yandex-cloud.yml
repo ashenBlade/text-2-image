@@ -1,7 +1,7 @@
 name: Docker Image CI
 
 on:
-  pull_request:
+  pull:
     branches: [ "main" ]
 
 env:
@@ -10,7 +10,6 @@ env:
   NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:${{ github.sha }}
 
 jobs:
-
   build-docker:
     runs-on: ubuntu-latest
 
@@ -33,7 +32,7 @@ jobs:
         context: src/backend
         file: ./Dockerfile
         push: true
-        tags: $BACKEND_IMAGE
+        tags: ${{ env.BACKEND_IMAGE }}
     
     - name: Build Frontend
       uses: docker/build-push-action@v3
@@ -43,7 +42,7 @@ jobs:
         push: true
         build-args: |
           server_url: ${{ secrets.API_SERVER_URL }}
-        tags: $FRONTEND_IMAGE
+        tags: ${{ env.FRONTEND_IMAGE }}
 
     - name: Compose together with Nginx
       uses: docker/build-push-action@v3
@@ -51,7 +50,7 @@ jobs:
         context: nginx
         file: ./Dockerfile
         push: true
-        tags: $NGINX_IMAGE
+        tags: ${{ env.NGINX_IMAGE }}
 
 
   update-yc:
