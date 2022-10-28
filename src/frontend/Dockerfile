@@ -5,8 +5,8 @@ WORKDIR /app
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
 
-ARG server_url
-ENV REACT_APP_SERVER_URL ${server_url}
+ARG SERVER_URL
+ENV REACT_APP_SERVER_URL ${SERVER_URL}
 
 RUN npm install --omit=dev
 COPY ./src /app/src

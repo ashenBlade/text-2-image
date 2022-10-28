@@ -56,8 +56,7 @@ jobs:
           context: src/frontend
           file: ./src/frontend/Dockerfile
           push: true
-          build-args: |
-            server_url: ${{ secrets.API_SERVER_URL }}
+          build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
           tags: ${{ env.FRONTEND_IMAGE }}
 
   build-nginx:
