@@ -1,0 +1,7 @@
+.idea
+*.cache
+.gitignore
+Dockerfile
+
+build
+node_modules

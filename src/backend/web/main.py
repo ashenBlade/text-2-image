@@ -1,4 +1,6 @@
 import logging
+import os
+import sys
 
 import uvicorn
 from fastapi import FastAPI
@@ -16,14 +18,27 @@ logging.basicConfig(
 )
 
 
-def setup_middleware(fast_api: FastAPI) -> None:
+def add_cors(fast_api: FastAPI) -> FastAPI:
+    origin_environmental_variable = os.environ['ORIGINS']
+    if not origin_environmental_variable:
+        raise EnvironmentError(
+            '"ORIGINS" env variable not provided. '
+            'Specify origins delimited by ","'
+        )
+    origins = origin_environmental_variable.split(',')
+
     fast_api.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    return fast_api
+
+
+def setup_middleware(fast_api: FastAPI) -> None:
+    add_cors(fast_api)
 
 
 def setup_routers(fast_api: FastAPI) -> None:

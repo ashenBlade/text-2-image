@@ -1,0 +1,7 @@
+users:
+  - name: ''
+    groups: sudo
+    shell: /bin/bash
+    sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
+    ssh-authorized-keys:
+      - {{ env.YC_VM_SSH }}
