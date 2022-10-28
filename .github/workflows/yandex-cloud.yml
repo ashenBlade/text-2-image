@@ -22,10 +22,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-        
-    - name: Setup Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v2
     
     - name: Build Backend
       uses: docker/build-push-action@v3
@@ -46,10 +42,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
 
       - name: Build Frontend
         uses: docker/build-push-action@v3
@@ -72,10 +64,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Setup Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
 
       - name: Build Nginx for together composing
         uses: docker/build-push-action@v3
