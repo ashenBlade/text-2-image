@@ -94,6 +94,9 @@ jobs:
       uses: yc-actions/yc-cr-login@v1
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+    
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: Deploy COI VM
       id: deploy-coi
