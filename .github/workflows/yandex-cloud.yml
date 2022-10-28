@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./src/backend
-        file: ./Dockerfile
+        file: ./src/backend/Dockerfile
         push: true
         tags: ${{ env.BACKEND_IMAGE }}
 
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: src/backend
-          file: ./Dockerfile
+          file: ./src/frontend/Dockerfile
           push: true
           build-args: |
             server_url: ${{ secrets.API_SERVER_URL }}
