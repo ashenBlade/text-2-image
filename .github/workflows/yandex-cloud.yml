@@ -5,9 +5,9 @@ on:
     branches: [ "main" ]
 
 env:
-  FRONTEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:latest
-  BACKEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:latest
-  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:latest
+  FRONTEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:${{ github.sha }}
+  BACKEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:${{ github.sha }}
+  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:${{ github.sha }}
 
 jobs:
 
@@ -73,15 +73,16 @@ jobs:
         BACKEND_IMAGE: $BACKEND_IMAGE
         FRONTEND_IMAGE: $FRONTEND_IMAGE
         NGINX_IMAGE: $NGINX_IMAGE
-        ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
+        FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
+        YC_VM_SSH: ${{ secrets.YC_VM_SSH }}
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-        folder-id: some-name********
-        VM-name: yc-action-demo
-        vm-service-account-id: some-account-id*******
+        folder-id: ${{ secrets.YC_FOLDER_ID }}
+        VM-name: ${{ secrets.YC_VM_NAME }}
+        vm-service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
         vm-cores: 1
-        vm-memory: 512Mb
-        vm-core-fraction: 100
-        vm-subnet-id: some-subnet-id*********
-        user-data-path: what******
-        docker-compose-path: './docker-compose.yc.yml'
+        vm-memory: 1Gb
+        vm-core-fraction: 20
+        vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
+        docker-compose-path: './yandex-cloud/docker-compose.yc.yml'
+        user-data-path: './yandex-cloud/user-data.yml'
