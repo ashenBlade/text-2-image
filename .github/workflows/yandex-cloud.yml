@@ -90,13 +90,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      
-    - name: Check pwd
-      run: |
-        pwd
-        ls
-        ls ..
-        ls yandex-cloud
 
     - name: Deploy COI VM
       id: deploy-coi
@@ -116,5 +109,5 @@ jobs:
         vm-memory: 1Gb
         vm-core-fraction: 20
         vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
-        docker-compose-path: 'yandex-cloud/docker-compose.yc.yml'
-        user-data-path: 'yandex-cloud/user-data.yml'
+        docker-compose-path: './yandex-cloud/docker-compose.yc.yaml'
+        user-data-path: './yandex-cloud/user-data.yaml'
