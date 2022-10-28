@@ -87,7 +87,7 @@ jobs:
 
   update-yc:
     runs-on: ubuntu-latest
-    needs: [build-docker]
+    needs: [build-backend, build-frontend, build-nginx]
     steps:
 
     - name: Login to Yandex Cloud
