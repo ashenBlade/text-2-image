@@ -105,9 +105,10 @@ jobs:
         folder-id: ${{ secrets.YC_FOLDER_ID }}
         VM-name: ${{ secrets.YC_VM_NAME }}
         vm-service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
-        vm-cores: 1
-        vm-memory: 1Gb
-        vm-core-fraction: 20
+        vm-cores: 2
+        vm-platform-id: 'standard-v2'
+        vm-memory: 512Mb
+        vm-core-fraction: 5
         vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
         docker-compose-path: './yandex-cloud/docker-compose.yc.yaml'
         user-data-path: './yandex-cloud/user-data.yaml'
