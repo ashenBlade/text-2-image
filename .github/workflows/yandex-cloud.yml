@@ -99,6 +99,8 @@ jobs:
         NGINX_IMAGE: ${{ env.NGINX_IMAGE }}
         FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
         YC_VM_SSH: ${{ secrets.YC_VM_SSH }}
+        YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
+        YC_VM_PASSWORD: ${{ secrets.YC_VM_PASSWORD }}
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
         folder-id: ${{ secrets.YC_FOLDER_ID }}
