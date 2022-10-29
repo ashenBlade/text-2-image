@@ -3,5 +3,5 @@ users:
     groups: sudo docker
     shell: /bin/bash
     sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
-    ssh-authorized-keys:
+    ssh_authorized_keys:
       - {{ env.YC_VM_SSH }}
