@@ -3,6 +3,12 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs: 
+      reason:
+        description: 'why'
+        required: false
+        default: 'just for fun'
 
 env:
   FRONTEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:${{ github.sha }}
