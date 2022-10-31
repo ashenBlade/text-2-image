@@ -1,6 +1,6 @@
 users:
   - name: {{ env.YC_VM_USERNAME }}
-    groups: sudo docker
+    groups: sudo
     shell: /bin/bash
     sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
     ssh_authorized_keys:
