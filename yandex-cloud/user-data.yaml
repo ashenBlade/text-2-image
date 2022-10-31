@@ -1,5 +1,4 @@
 #cloud-config
-
 users:
   - name: {{ env.YC_VM_USERNAME }}
     groups: sudo
