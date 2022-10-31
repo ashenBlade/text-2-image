@@ -100,7 +100,8 @@ jobs:
         FRONTEND_ORIGINS: ${{ secrets.FRONTEND_ORIGINS }}
         YC_VM_SSH: ${{ secrets.YC_VM_SSH }}
         YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
-        YC_VM_PASSWORD: ${{ secrets.YC_VM_PASSWORD }}
+        NGINX_CERT: ${{ secrets.NGINX_CERT }}
+        NGINX_CERT_KEY: ${{ secrets:NGINX_CERT_KEY }}
       with:
         yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
         folder-id: ${{ secrets.YC_FOLDER_ID }}
