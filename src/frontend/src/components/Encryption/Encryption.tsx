@@ -18,10 +18,16 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
     const [imageFilename, setImageFilename] = useState('');
     const [createdImageUrl, setCreatedImageUrl] = useState('')
     const [showImageModal, setShowImageModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>();
 
     const inputFileRef = useRef<HTMLInputElement>(null);
 
     const imageFormats = useMemo(() => Object.values(ImageFormat), []);
+
+    const showError = (msg: string) => {
+        setErrorMessage(undefined);
+        setErrorMessage(msg);
+    }
 
     const updateImageUrl = (blob: Blob) => {
         URL.revokeObjectURL(createdImageUrl);
@@ -61,15 +67,16 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
             console.error(e);
             return;
         }
+
         setImageLoading(true);
         try {
-            try {
-                updateImageUrl(await encryptor.encryptAsync(data, chosenImageFormat))
-                setImageFilename(`${selectedFile?.name || 'converted'}.${chosenImageFormat}`)
-                setShowImageModal(true);
-            } catch (e) {
-                console.error('Could not encrypt image', e);
-            }
+            updateImageUrl(await encryptor.encryptAsync(data, chosenImageFormat))
+            setImageFilename(`${selectedFile?.name || 'converted'}.${chosenImageFormat}`)
+            setShowImageModal(true);
+        }
+        catch (e) {
+            console.error(e);
+            showError('Could not convert image')
         }
         finally {
             setImageLoading(false);
@@ -106,7 +113,8 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                         value: f
                     }))
                 }
-            ]}>
+            ]}
+            error={errorMessage}>
             <div style={{
                 display: 'flex',
                 flex: '1 1 auto',

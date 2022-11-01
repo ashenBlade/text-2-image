@@ -11,6 +11,7 @@ export interface MainPageLayoutProps {
     }[]
     menuElements?: MenuElement[]
     children?: ReactNode | ReactNode[]
+    error?: string
 }
 
 export {}
