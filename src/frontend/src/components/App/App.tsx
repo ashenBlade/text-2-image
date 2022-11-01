@@ -44,12 +44,18 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                         <MenuIcon/>
                     </IconButton>
                     <Box sx={{display: {xs: 'none', sm: 'block'}}}>
-                        <Button onClick={() => navigate(textToImagePath)} sx={{color: '#fff'}}>
+                        <Button onClick={() => {
+                            navigate(textToImagePath);
+                            document.title = 'Text to image'
+                        }} sx={{color: '#fff'}}>
                             <Typography>
                                 Text to Image
                             </Typography>
                         </Button>
-                        <Button onClick={() => navigate(imageToTextPath)} sx={{color: '#fff'}}>
+                        <Button onClick={() => {
+                            navigate(imageToTextPath);
+                            document.title = 'Image to text'
+                        }} sx={{color: '#fff'}}>
                             <Typography>
                                 Image to Text
                             </Typography>
