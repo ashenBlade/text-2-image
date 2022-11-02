@@ -140,23 +140,52 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                 </Routes>
             </Container>
             <Dialog open={showHelpDialog} onClose={() => {
-                // setShowHelpDialog(false);
+                setShowHelpDialog(false)
             }}>
                 <DialogTitle>
-                    About application
+                    <Typography variant={'h4'}>How to use it</Typography>
                 </DialogTitle>
+                <Divider/>
                 <DialogContent>
                     <Typography mb={2}>
                         This is an application for encoding text into image and vice versa.
                     </Typography>
+
+
+                    <Typography variant={'h5'}>Text to Image</Typography>
                     <Typography mb={2}>
-                        On "Text to Image" page you can enter text manually or select (drag) text file.
-                        Then click "Convert" and get your encoded image.
+                        <ol>
+                            <li>
+                                <Typography>
+                                    Enter text manually or select (drag) text file.
+                                </Typography>
+                            </li>
+
+                            <li>
+                                <Typography>
+                                    Click "Convert" and get your encoded image.
+                                </Typography>
+                            </li>
+                        </ol>
                     </Typography>
+                    <Typography variant={'h5'}>Image to Text</Typography>
                     <Typography>
-                        On "Image to Text" page select your previously encoded image and click "Deconvert" to get your text back!
+                        <ol>
+                            <li>
+                                <Typography>
+                                    Select your previously encoded image.
+                                </Typography>
+                            </li>
+                            <li>
+                                <Typography>
+                                    Click "Deconvert" to get your text back.
+                                </Typography>
+                            </li>
+                        </ol>
                     </Typography>
+
                 </DialogContent>
+                <Divider/>
                 <DialogActions>
                     <Button onClick={() => {
                         setShowHelpDialog(false)
