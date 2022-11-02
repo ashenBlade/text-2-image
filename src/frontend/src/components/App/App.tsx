@@ -8,14 +8,13 @@ import {
     AppBar,
     Box,
     Button,
-    Container,
+    Container, Dialog, DialogActions, DialogContent, DialogTitle,
     Divider,
     Drawer, IconButton,
     List,
     ListItem,
     ListItemButton,
-    ListItemText,
-    Toolbar, Typography,
+    ListItemText, Toolbar, Typography,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
 import Decryption from "../Decryption/Decryption";
@@ -25,7 +24,7 @@ import './App.css'
 const App: FC<AppProps> = ({encryptor, decryptor}) => {
     const navigate = useNavigate();
     const [openDrawer, setOpenDrawer] = useState(false);
-
+    const [showHelpDialog, setShowHelpDialog] = useState(false);
     return (
         <div className={'app'}>
             <AppBar component={'nav'}
@@ -43,7 +42,7 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                                 }}>
                         <MenuIcon/>
                     </IconButton>
-                    <Box sx={{display: {xs: 'none', sm: 'block'}}}>
+                    <Box sx={{display: {xs: 'none', sm: 'flex'}, flexGrow: 1}}>
                         <Button onClick={() => {
                             navigate(textToImagePath);
                             document.title = 'Text to image'
@@ -61,54 +60,73 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                             </Typography>
                         </Button>
                     </Box>
+                    <Button sx={{color: '#fff', display: {xs: 'none', sm: 'block'}}}
+                            onClick={() => {
+                                setShowHelpDialog(true)
+                            }}>
+
+                        <Typography>
+                            Help
+                        </Typography>
+                    </Button>
                 </Toolbar>
-                    <Drawer variant={'temporary'}
-                            anchor={'left'}
-                            open={openDrawer}
-                            PaperProps={{
-                                style: {
-                                    width: 240
-                                }
-                            }}
-                            onClose={() => setOpenDrawer(false)}>
-                        <Toolbar style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-end'
-                        }}>
-                            <div>
-                                <IconButton onClick={() => setOpenDrawer(false)}>
-                                    <ChevronLeft/>
-                                </IconButton>
-                            </div>
-                        </Toolbar>
-                        <List>
-                            <Divider/>
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    onClick={() => {
-                                        navigate(textToImagePath);
-                                        setOpenDrawer(false);
-                                    }}>
-                                    <ListItemText>
-                                        Text to image
-                                    </ListItemText>
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider/>
-                            <ListItem disablePadding>
-                                <ListItemButton onClick={() => {
-                                    navigate(imageToTextPath);
+                <Drawer variant={'temporary'}
+                        anchor={'left'}
+                        open={openDrawer}
+                        PaperProps={{
+                            style: {
+                                width: 240
+                            }
+                        }}
+                        onClose={() => setOpenDrawer(false)}>
+                    <Toolbar style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end'
+                    }}>
+                        <div>
+                            <IconButton onClick={() => setOpenDrawer(false)}>
+                                <ChevronLeft/>
+                            </IconButton>
+                        </div>
+                    </Toolbar>
+                    <List>
+                        <Divider/>
+                        <ListItem disablePadding>
+                            <ListItemButton
+                                onClick={() => {
+                                    navigate(textToImagePath);
                                     setOpenDrawer(false);
                                 }}>
-                                    <ListItemText>
-                                        Image to text
-                                    </ListItemText>
-                                </ListItemButton>
-                            </ListItem>
-                            <Divider/>
-                        </List>
-                    </Drawer>
+                                <ListItemText>
+                                    Text to image
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+                        <Divider/>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => {
+                                navigate(imageToTextPath);
+                                setOpenDrawer(false);
+                            }}>
+                                <ListItemText>
+                                    Image to text
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+                        <Divider/>
+                        <div style={{display: 'flex', flexGrow: 1, flexFlow: 'column wrap'}}/>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => {
+                                setShowHelpDialog(true);
+                            }}>
+                                <ListItemText>
+                                    Help
+                                </ListItemText>
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </Drawer>
             </AppBar>
             <Container style={{
                 display: 'flex',
@@ -121,6 +139,32 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                     <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                 </Routes>
             </Container>
+            <Dialog open={showHelpDialog} onClose={() => {
+                // setShowHelpDialog(false);
+            }}>
+                <DialogTitle>
+                    About application
+                </DialogTitle>
+                <DialogContent>
+                    <Typography mb={2}>
+                        This is an application for encoding text into image and vice versa.
+                    </Typography>
+                    <Typography mb={2}>
+                        On "Text to Image" page you can enter text manually or select (drag) text file.
+                        Then click "Convert" and get your encoded image.
+                    </Typography>
+                    <Typography>
+                        On "Image to Text" page select your previously encoded image and click "Deconvert" to get your text back!
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {
+                        setShowHelpDialog(false)
+                    }}>
+                        Got it
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };
