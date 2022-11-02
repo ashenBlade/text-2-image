@@ -161,7 +161,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         : <Button variant={'outlined'}
                                   color={'info'}
                                   onClick={clickInput}>
-                            Choose file
+                            Choose image
                         </Button>}
                 </div>
             </div>

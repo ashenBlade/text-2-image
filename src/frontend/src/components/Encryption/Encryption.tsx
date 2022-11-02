@@ -94,7 +94,7 @@ const Encryption: FC<EncryptionProps> = ({encryptor}) => {
                     disabled: imageLoading || (isTextInput() && !inputText)
                 },
                 {
-                    name: 'Upload file',
+                    name: 'Upload text file',
                     variant: 'outlined',
                     color: 'info',
                     onClick: uploadFileOnClick,
