@@ -1,12 +1,19 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {MainPageLayoutProps} from "./MainPageLayoutProps";
-import {Box, Button, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
+import {Alert, Box, Button, FormControl, InputLabel, MenuItem, Select, Snackbar} from "@mui/material";
 import './MainPageLayout.css'
 
 const MainPageLayout: FC<MainPageLayoutProps> = (
     {buttons,
         menuElements,
-        children}) => {
+        children,
+        error}) => {
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
+    useEffect(() => {
+        setShowErrorAlert(error !== undefined && error !== '');
+    }, [error, setShowErrorAlert]);
+
+
     return (
         <Box className={'main-content'}>
             <Box className={'main-content_actions'}>
@@ -53,6 +60,15 @@ const MainPageLayout: FC<MainPageLayoutProps> = (
             <Box className={'main-content_input'}>
                 {children}
             </Box>
+            <Snackbar open={showErrorAlert}>
+                <Alert variant={'filled'}
+                       color={'error'}
+                       onClose={() => setShowErrorAlert(false)}>
+                    {
+                        error
+                    }
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

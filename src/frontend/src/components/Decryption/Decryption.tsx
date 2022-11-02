@@ -17,11 +17,17 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
     const [convertedText, setConvertedText] = useState<string>();
     const [showModal, setShowModal] = useState(false);
     const [chosenImageFormat, setChosenImageFormat] = useState(ImageFormat.PNG);
+    const [errorPopupMessage, setErrorMessage] = useState<string>();
 
     const inputRef = useRef<HTMLInputElement>(null);
     const textareaModalRef = useRef<HTMLTextAreaElement>(null);
 
     const imageFormats = useMemo(() => Object.values(ImageFormat), []);
+
+    function showError(msg: string) {
+        setErrorMessage(undefined);
+        setErrorMessage(msg);
+    }
 
     function isFileUploaded() {
         return uploadedFile !== null;
@@ -57,7 +63,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
             setShowModal(true);
         } catch (e) {
             console.error(e);
-            alert('Could not reconvert image')
+            showError('Could not convert image');
         } finally {
             setIsDecrypting(false);
         }
@@ -96,7 +102,8 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         value: f
                     }))
                 }
-            ]}>
+            ]}
+            error={errorPopupMessage}>
             <div style={{
                 display: 'flex',
                 flex: '1 1 auto',
@@ -154,7 +161,7 @@ const Decryption: FC<DecryptionProps> = ({decryptor}) => {
                         : <Button variant={'outlined'}
                                   color={'info'}
                                   onClick={clickInput}>
-                            Choose file
+                            Choose image
                         </Button>}
                 </div>
             </div>
