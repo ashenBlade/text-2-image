@@ -142,8 +142,8 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
             <Dialog open={showHelpDialog} onClose={() => {
                 setShowHelpDialog(false)
             }}>
-                <DialogTitle>
-                    <Typography variant={'h4'}>How to use it</Typography>
+                <DialogTitle variant={'h5'}>
+                        How to use it
                 </DialogTitle>
                 <Divider/>
                 <DialogContent>
@@ -155,6 +155,11 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                     <Typography variant={'h5'}>Text to Image</Typography>
                     <Typography mb={2}>
                         <ol>
+                            <li>
+                                <Typography>
+                                    Go to "Text to image" page
+                                </Typography>
+                            </li>
                             <li>
                                 <Typography>
                                     Enter text manually or select (drag) text file.
@@ -171,6 +176,11 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                     <Typography variant={'h5'}>Image to Text</Typography>
                     <Typography>
                         <ol>
+                            <li>
+                                <Typography>
+                                    Go to "Image to text" page
+                                </Typography>
+                            </li>
                             <li>
                                 <Typography>
                                     Select your previously encoded image.
