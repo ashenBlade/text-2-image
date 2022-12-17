@@ -137,7 +137,6 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                 <Routes>
                     <Route path={imageToTextPath} shouldRevalidate={() => false} element={<Decryption decryptor={decryptor}/>}/>
                     <Route path={textToImagePath} shouldRevalidate={() => false} element={<Encryption encryptor={encryptor}/>}/>
-                    <Route path={'/secret'} element={<SecretPage/>}/>
                     <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                 </Routes>
             </Container>

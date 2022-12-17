@@ -1,7 +1,8 @@
 import React from 'react';
 
 const SecretPage = () => {
-    return (<>
+    return (
+        <>
             <head>
                 <meta charSet="UTF-8"/>
                     <meta name="description" content="Front-end and Vue Developer"/>
