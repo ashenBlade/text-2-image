@@ -17,10 +17,9 @@ import {
     ListItemText, Toolbar, Typography,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
-import Decryption from "../Decryption/Decryption";
-import {ChevronLeft} from "@mui/icons-material";
+import Decryption from "../Decryption/Decryption"
+import {ChevronLeft} from "@mui/icons-material"
 import './App.css'
-import SecretPage from "../SecretPage/SecretPage";
 
 const App: FC<AppProps> = ({encryptor, decryptor}) => {
     const navigate = useNavigate();
