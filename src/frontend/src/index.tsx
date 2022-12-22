@@ -7,7 +7,6 @@ import EmptyEncryptorService from "./services/emptyEncryptorService";
 import EmptyDecryptService from "./services/emptyDecryptService";
 import BackendDecryptService from "./services/backendDecryptService";
 import {BrowserRouter} from "react-router-dom";
-import SecretPage from "./components/SecretPage/SecretPage";
 
 const rootElement = document.getElementById('root');
 rootElement!.style.height = '100%';
@@ -49,13 +48,10 @@ const decryptor = getDecryptor();
 
 root.render(
   <React.StrictMode>
-          {window.window.location.pathname === '/secret'
-              ? <SecretPage/>
-              : <BrowserRouter>
-                  <App encryptor={encryptor}
+      <BrowserRouter>
+          <App encryptor={encryptor}
                        decryptor={decryptor}/>
-              </BrowserRouter>
-          }
+      </BrowserRouter>
   </React.StrictMode>
 );
 
