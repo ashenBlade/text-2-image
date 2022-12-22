@@ -17,10 +17,9 @@ import {
     ListItemText, Toolbar, Typography,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu'
-import Decryption from "../Decryption/Decryption";
-import {ChevronLeft} from "@mui/icons-material";
+import Decryption from "../Decryption/Decryption"
+import {ChevronLeft} from "@mui/icons-material"
 import './App.css'
-import SecretPage from "../SecretPage/SecretPage";
 
 const App: FC<AppProps> = ({encryptor, decryptor}) => {
     const navigate = useNavigate();
@@ -137,7 +136,6 @@ const App: FC<AppProps> = ({encryptor, decryptor}) => {
                 <Routes>
                     <Route path={imageToTextPath} shouldRevalidate={() => false} element={<Decryption decryptor={decryptor}/>}/>
                     <Route path={textToImagePath} shouldRevalidate={() => false} element={<Encryption encryptor={encryptor}/>}/>
-                    <Route path={'/secret'} element={<SecretPage/>}/>
                     <Route path={'*'} element={<Navigate to={textToImagePath}/>}/>
                 </Routes>
             </Container>
